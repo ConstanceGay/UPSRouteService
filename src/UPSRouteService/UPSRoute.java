@@ -77,7 +77,23 @@ public class UPSRoute {
         }
 
         if (steps != null) {
-            return getPath(steps);
+            Path path = new Path();
+
+            for (int i = 0; i < steps.length(); i++) {
+                try {
+                    String jsonStep = steps.get(i).toString();
+                    JSONObject step = new JSONObject(jsonStep);
+
+                    String name = step.get("name").toString();
+                    int type = Integer.parseInt(step.get("type").toString());
+                    String wayPointsStr = step.get("way_points").toString().replace("[", "").replace("]", "");
+                    path.add(new Instruction(name, type, getWayPoints(wayPointsStr)));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return path;
         } else {
             return null;
         }
@@ -96,36 +112,35 @@ public class UPSRoute {
         }
 
         if (steps != null) {
-            return getPath(steps);
+            Path path = new Path();
+
+            for (int i = 0; i < steps.length(); i++) {
+                try {
+                    String jsonStep = steps.get(i).toString();
+                    JSONObject step = new JSONObject(jsonStep);
+
+                    String instruction = step.get("instruction").toString();
+                    String wayPointsStr = step.get("way_points").toString().replace("[", "").replace("]", "");
+                    path.add(new Instruction(getWayPoints(wayPointsStr), instruction));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return path;
         } else {
             return null;
         }
     }
 
-    private Path getPath(JSONArray steps) {
-        Path path = new Path();
-
-        for (int i = 0; i < steps.length(); i++) {
-            try {
-                String jsonStep = steps.get(i).toString();
-                JSONObject step = new JSONObject(jsonStep);
-
-                String name = step.get("name").toString();
-                int type = Integer.parseInt(step.get("type").toString());
-                String wayPointsStr = step.get("way_points").toString().replace("[", "").replace("]", "");
-                List<String> temp = new ArrayList<>(Arrays.asList(wayPointsStr.split(",")));
-                List<Integer> wayPoints = new ArrayList<>();
-                for (String str : temp) {
-                    wayPoints.add(Integer.parseInt(str));
-                }
-
-                path.add(new Instruction(name, type, wayPoints));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    private List<Integer> getWayPoints(String wayPoints) {
+        List<String> temp = new ArrayList<>(Arrays.asList(wayPoints.split(",")));
+        List<Integer> wayPointsList = new ArrayList<>();
+        for (String str : temp) {
+            wayPointsList.add(Integer.parseInt(str));
         }
 
-        return path;
+        return wayPointsList;
     }
 
     public String toString() {

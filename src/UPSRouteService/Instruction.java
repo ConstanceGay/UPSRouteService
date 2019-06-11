@@ -28,6 +28,11 @@ public class Instruction {
         instruction = (name.equals("-")) ? instructionTypeNoNameMap.get(type) : instructionTypeMap.get(type) + name;
     }
 
+    Instruction(List<Integer> wayPoints, String instruction) {
+        this.wayPoints = wayPoints;
+        this.instruction = instruction;
+    }
+
     public String getInstruction() {
         return instruction;
     }
