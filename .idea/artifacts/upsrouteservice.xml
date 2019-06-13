@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="upsrouteservice">
+    <output-path>$PROJECT_DIR$/out/artifacts/upsrouteservice</output-path>
+    <root id="archive" name="upsrouteservice.jar">
+      <element id="module-output" name="RouteServiceUPS" />
+      <element id="library" level="project" name="java-json" />
+    </root>
+  </artifact>
+</component>

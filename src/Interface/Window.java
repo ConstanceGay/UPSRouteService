@@ -1,7 +1,6 @@
 package Interface;
 
 import UPSRouteService.Location;
-
 import javax.swing.*;
 
 public class Window extends JFrame {
@@ -9,7 +8,7 @@ public class Window extends JFrame {
     public Window() {
         super();
         this.setTitle("Maquette UPS");
-        this.setSize(1043, 600);
+        this.setSize(979, 541);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 

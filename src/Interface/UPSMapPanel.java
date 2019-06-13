@@ -29,6 +29,8 @@ public class UPSMapPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        //g2.rotate(Math.toRadians(-30));
 
         try {
             BufferedImage image = ImageIO.read(new File("img/ups-map.jpg"));
@@ -50,21 +52,20 @@ public class UPSMapPanel extends JPanel {
             e.printStackTrace();
         }
 
+        g2.setStroke(new BasicStroke(2));
+
         g.setColor(Color.BLUE);
         g.drawOval((int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2, 4, 4);
-        g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
+        //g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
 
         for (int i = 0; i < coordinates.size() - 1; i++) {
-            g.setColor(Color.RED);
-            g.drawLine((int)coordinates.get(i).gps2vue().getX(), (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX(), (int)coordinates.get(i + 1).gps2vue().getY());
+            g2.setColor(Color.RED);
+            g2.drawLine((int)coordinates.get(i).gps2vue().getX(), (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX(), (int)coordinates.get(i + 1).gps2vue().getY());
         }
 
         g.setColor(Color.BLUE);
         g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
-        g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.rotate(90 * Math.PI / 180);
+        //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
     }
 
     private double getScaleFactorToFit(Dimension original, Dimension toFit) {

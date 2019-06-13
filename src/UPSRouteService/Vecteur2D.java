@@ -32,7 +32,7 @@ public class Vecteur2D {
     }
 
     public Vecteur2D normer() {
-        double norme  = Math.sqrt(sommeCarres());
+        double norme = Math.sqrt(sommeCarres());
         return new Vecteur2D(x / norme, y / norme);
     }
 

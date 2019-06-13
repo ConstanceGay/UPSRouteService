@@ -26,7 +26,6 @@ public class UPSRouteService {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8");
 
-
             String content = getStream(connection.getInputStream());
             connection.disconnect();
 
