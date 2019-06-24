@@ -1,5 +1,6 @@
 package UPSRouteService;
 
+import Interface.UPSMapPanel;
 import Utilities.JSONManager;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,6 +12,13 @@ public class UPSRoute {
 
     private JSONObject json;
     private boolean postCall;
+    private UPSMapPanel upsMapPanel;
+
+    UPSRoute(JSONObject json, UPSMapPanel upsMapPanel, boolean postCall) {
+        this.json = json;
+        this.postCall = postCall;
+        this.upsMapPanel = upsMapPanel;
+    }
 
     UPSRoute(JSONObject json, boolean postCall) {
         this.json = json;
@@ -51,7 +59,17 @@ public class UPSRoute {
                     String coordinate = coordinates.get(i).toString();
                     coordinate = coordinate.replace("[", "");
                     coordinate = coordinate.replace("]", "");
-                    coordinatesList.add(new Vecteur2D(Double.parseDouble(coordinate.split(",")[0]), Double.parseDouble(coordinate.split(",")[1])));
+
+                    if (upsMapPanel == null) {
+                        coordinatesList.add(new Vecteur2D(Double.parseDouble(coordinate.split(",")[0]),
+                                Double.parseDouble(coordinate.split(",")[1])));
+                    } else {
+                        coordinatesList.add(new Vecteur2D(Double.parseDouble(coordinate.split(",")[0]),
+                                Double.parseDouble(coordinate.split(",")[1]),
+                                upsMapPanel.getGpsDownLeft(),
+                                upsMapPanel.getGpsDownRight(),
+                                upsMapPanel.getGpsUpLeft()));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

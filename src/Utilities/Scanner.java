@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -76,8 +77,9 @@ public class Scanner {
 
 /**
  * Default constructor
+ * @param in
  */
-   public Scanner() {
+   public Scanner(InputStream in) {
       this.image   = null;
       this.w       = 0;
       this.h       = 0;

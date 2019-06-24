@@ -2,7 +2,9 @@ package UPSRouteService;
 
 public enum Profile {
 
-    WHEELCHAIR("wheelchair"), WALKING("foot-walking"), CYCLING("cycling-regular");
+    WHEELCHAIR("wheelchair"),
+    WALKING("foot-walking"),
+    CYCLING("cycling-regular");
 
     private String apiProfileName;
 
