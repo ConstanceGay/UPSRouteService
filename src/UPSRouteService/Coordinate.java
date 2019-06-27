@@ -1,9 +1,16 @@
 package UPSRouteService;
 
-public class Coordinate {
+import java.io.Serializable;
+
+public class Coordinate implements Serializable {
 
     private double x;
     private double y;
+
+    public Coordinate() {
+        this.x = 0;
+        this.y = 0;
+    }
 
     public Coordinate(double x, double y) {
         this.x = x;
@@ -26,8 +33,12 @@ public class Coordinate {
         return y;
     }
 
-    public double squaredSum() {
+    public double getSquaredSum() {
         return x * x + y * y;
+    }
+
+    public String toString() {
+        return "[" + x + ", " + y + "]";
     }
 
 }

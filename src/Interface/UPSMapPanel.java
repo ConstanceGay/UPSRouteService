@@ -1,18 +1,12 @@
 package Interface;
 
-import UPSRouteService.Coordinate;
-import UPSRouteService.Location;
-import UPSRouteService.Profile;
-import UPSRouteService.UPSRouteService;
-import UPSRouteService.Vecteur2D;
-import UPSRouteService.UPSRoute;
+import UPSRouteService.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -21,15 +15,20 @@ public class UPSMapPanel extends JPanel {
 
     private List<Vecteur2D> coordinates;
     private UPSRouteService upsRouteService = new UPSRouteService(this);
-    private Coordinate gpsDownLeft = new Coordinate(1.46027, 43.55543);
-    private Coordinate gpsDownRight = new Coordinate(1.48037, 43.55543);
-    private Coordinate gpsUpLeft = new Coordinate(1.46036, 43.56564);
+    private Image scaled;
+    private int xOffset;
+    private Coordinate gpsDownLeft;
+    private Coordinate gpsDownRight;
+    private Coordinate gpsUpLeft;
 
     UPSMapPanel(Location start, Location end) {
+        loadGpsConfig();
         drawRoute(start, end);
 
         CalibrationWindow calibrationWindow = new CalibrationWindow();
         calibrationWindow.setVisible(true);
+
+        this.setBackground(Color.BLACK);
     }
 
     void setProfile(Profile profile) {
@@ -39,8 +38,10 @@ public class UPSMapPanel extends JPanel {
     void drawRoute(Location start, Location end) {
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
-        if (upsRoute != null)
+        if (upsRoute != null) {
             coordinates = upsRoute.getCoordinates();
+            System.out.println(upsRoute.getSteps());
+        }
         else
             JOptionPane.showMessageDialog(this,
                     "Impossible de trouver un itinéraire avec ces paramètres de navigation.",
@@ -49,27 +50,27 @@ public class UPSMapPanel extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        //g2.rotate(Math.toRadians(-54), this.getWidth() / 2, this.getHeight() / 2);
+        //g2.rotate(Math.toRadians(-55), this.getWidth() / 2, this.getHeight() / 2);
 
         try {
-            BufferedImage image = ImageIO.read(new File("img/ups-map1.png"));
+            BufferedImage image = ImageIO.read(new File("img/ups-map-real-sideways.png"));
             double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
 
             int scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
             int scaleHeight = (int) Math.round(image.getHeight() * scaleFactor);
 
-            Image scaled = image.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
+            scaled = image.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
 
             int width = getWidth() - 1;
             int height = getHeight() - 1;
 
-            int x = (width - scaled.getWidth(this)) / 2;
+            xOffset = (width - scaled.getWidth(this)) / 2;
             int y = (height - scaled.getHeight(this)) / 2;
 
-            g.drawImage(scaled, x, y, this);
+            g.drawImage(scaled, xOffset, y, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,6 +116,32 @@ public class UPSMapPanel extends JPanel {
         return dScale;
     }
 
+    private void loadGpsConfig() {
+        try {
+            FileInputStream fileInputStream = new FileInputStream("data/gpsUpLeft.ser");
+            ObjectInputStream in = new ObjectInputStream(fileInputStream);
+            gpsUpLeft = (Coordinate)in.readObject();
+
+            fileInputStream = new FileInputStream("data/gpsDownLeft.ser");
+            in = new ObjectInputStream(fileInputStream);
+            gpsDownLeft = (Coordinate)in.readObject();
+
+            fileInputStream = new FileInputStream("data/gpsDownRight.ser");
+            in = new ObjectInputStream(fileInputStream);
+            gpsDownRight = (Coordinate)in.readObject();
+
+            in.close();
+            fileInputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            if (e instanceof InvalidClassException) {
+                gpsUpLeft = new Coordinate(1.46125, 43.5654);
+                gpsDownLeft = new Coordinate(1.46127, 43.555555);
+                gpsDownRight = new Coordinate(1.4749, 43.5556);
+            }
+            e.printStackTrace();
+        }
+    }
+
     public Coordinate getGpsDownLeft() {
         return gpsDownLeft;
     }
@@ -127,12 +154,24 @@ public class UPSMapPanel extends JPanel {
         return gpsUpLeft;
     }
 
+    public int getImageWidth() {
+        return scaled.getWidth(this);
+    }
+
+    public int getImageHeight() {
+        return scaled.getHeight(this);
+    }
+
+    public int getXOffset() {
+        return xOffset;
+    }
+
     class CalibrationWindow extends JFrame {
 
         CalibrationWindow() {
             super();
             this.setTitle("Calibrage");
-            this.setSize(240, 300);
+            this.setSize(240, 310);
             this.setResizable(false);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -141,6 +180,44 @@ public class UPSMapPanel extends JPanel {
             this.add(createConfig("Haut Gauche", gpsUpLeft));
             this.add(createConfig("Bas Gauche", gpsDownLeft));
             this.add(createConfig("Bas Droit", gpsDownRight));
+
+            JButton cancelButton = new JButton("Annuler");
+            cancelButton.addActionListener(e -> {
+                loadGpsConfig();
+                System.out.println(gpsUpLeft.getY());
+            });
+
+            JButton saveButton = new JButton("Sauvegarder");
+            saveButton.addActionListener(e -> {
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream("data/gpsUpLeft.ser");
+                    ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+                    out.writeObject(gpsUpLeft);
+
+                    fileOutputStream = new FileOutputStream("data/gpsDownLeft.ser");
+                    out = new ObjectOutputStream(fileOutputStream);
+                    out.writeObject(gpsDownLeft);
+
+                    fileOutputStream = new FileOutputStream("data/gpsDownRight.ser");
+                    out = new ObjectOutputStream(fileOutputStream);
+                    out.writeObject(gpsDownRight);
+
+                    fileOutputStream.close();
+                    out.close();
+
+                    JOptionPane.showMessageDialog(this,
+                            "Les paramètres de calibration ont bien étaient sauvegardés.",
+                            "Information",
+                            JOptionPane.PLAIN_MESSAGE);
+                } catch(IOException i) {
+                    i.printStackTrace();
+                }
+            });
+
+            JPanel buttonsPanel = new JPanel();
+            //buttonsPanel.add(cancelButton); TODO : réparer ce bouton qui ne fonctionne pas
+            buttonsPanel.add(saveButton);
+            this.add(buttonsPanel);
         }
 
         private JPanel createConfig(String title, Coordinate coordinate) {

@@ -16,7 +16,7 @@ public class MapWindow extends JFrame {
     public MapWindow() {
         super();
         this.setTitle("Maquette UPS");
-        this.setSize(830, 630);
+        this.setSize(1090, 634);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
 
@@ -30,7 +30,7 @@ public class MapWindow extends JFrame {
                         frame.dispose();
                         frame.setExtendedState(JFrame.NORMAL);
                         frame.setUndecorated(false);
-                        frame.setSize(830, 630);
+                        frame.setSize(702, 682);
                         frame.setVisible(true);
                         isFullScreen = false;
                     } else {
@@ -59,6 +59,10 @@ public class MapWindow extends JFrame {
         new NavigationWindow();
 
         this.setVisible(true);
+    }
+
+    public UPSMapPanel getMapPanel() {
+        return upsMapPanel;
     }
 
     class NavigationWindow extends JFrame {
