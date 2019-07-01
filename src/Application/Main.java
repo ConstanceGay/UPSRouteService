@@ -17,6 +17,7 @@ import java.util.List;
 public class Main {
 
     private static MapWindow mapWindow;
+    private static CameraWindow cameraWindow;
 
     public static void main(String[] args) {
         new Thread(() -> {
@@ -24,11 +25,16 @@ public class Main {
             mapWindow.open();
         }).start();
 
-        new CameraWindow().runCamera();
+        cameraWindow = new CameraWindow();
+        cameraWindow.runCamera();
     }
 
     public static MapWindow getMapWindow() {
         return mapWindow;
+    }
+
+    public static CameraWindow getCameraWindow() {
+        return cameraWindow;
     }
 
 }

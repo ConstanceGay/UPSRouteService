@@ -9,14 +9,14 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.LinkedList;
 import java.util.List;
 
 public class UPSMapPanel extends JPanel {
 
     private List<Vecteur2D> coordinates;
     private UPSRouteService upsRouteService = new UPSRouteService(this);
-    private Image scaled;
-    private int xOffset;
+    private List<GPSPoint> pointsToDraw = new LinkedList<GPSPoint>();
     private Coordinate gpsDownLeft;
     private Coordinate gpsDownRight;
     private Coordinate gpsUpLeft;
@@ -62,15 +62,15 @@ public class UPSMapPanel extends JPanel {
             int scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
             int scaleHeight = (int) Math.round(image.getHeight() * scaleFactor);
 
-            scaled = image.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
+            Image scaled = image.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
 
             int width = getWidth() - 1;
             int height = getHeight() - 1;
 
-            xOffset = (width - scaled.getWidth(this)) / 2;
+            int x = (width - scaled.getWidth(this)) / 2;
             int y = (height - scaled.getHeight(this)) / 2;
 
-            g.drawImage(scaled, xOffset, y, this);
+            g.drawImage(scaled, x, y, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,6 +89,13 @@ public class UPSMapPanel extends JPanel {
         g.setColor(Color.BLUE);
         g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
         //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
+
+        g.setColor(Color.RED);
+        for (GPSPoint coordinate : pointsToDraw) {
+            Vecteur2D vecteur2D = new Vecteur2D(coordinate.getLongitude(), coordinate.getLatitude());
+            //System.out.println("point to draw : " + vecteur2D.gps2vue());
+            g.fillOval((int)vecteur2D.gps2vue().getX(), (int)vecteur2D.gps2vue().getY(), 10, 10);
+        }
     }
 
     private double getScaleFactorToFit(Dimension original, Dimension toFit) {
@@ -154,16 +161,12 @@ public class UPSMapPanel extends JPanel {
         return gpsUpLeft;
     }
 
-    public int getImageWidth() {
-        return scaled.getWidth(this);
+    void addPointToDraw(GPSPoint coordinate) {
+        pointsToDraw.add(coordinate);
     }
 
-    public int getImageHeight() {
-        return scaled.getHeight(this);
-    }
-
-    public int getXOffset() {
-        return xOffset;
+    void clearPointsToDraw() {
+        pointsToDraw.clear();
     }
 
     class CalibrationWindow extends JFrame {
@@ -254,14 +257,14 @@ public class UPSMapPanel extends JPanel {
             latitudeMinusButton.setPreferredSize(new Dimension(20, 20));
             latitudeMinusButton.addActionListener(e -> {
                 coordinate.setY(coordinate.getY() - 0.00001);
-                latitudeLabel.setText("Longitude : " + df.format(coordinate.getY()));
+                latitudeLabel.setText("Latitude : " + df.format(coordinate.getY()));
             });
 
             JButton latitudePlusButton = new JButton(plusIcon);
             latitudePlusButton.setPreferredSize(new Dimension(20, 20));
             latitudePlusButton.addActionListener(e -> {
                 coordinate.setY(coordinate.getY() + 0.00001);
-                latitudeLabel.setText("Longitude : " + df.format(coordinate.getY()));
+                latitudeLabel.setText("Latitude : " + df.format(coordinate.getY()));
             });
 
             JPanel subPanel = new JPanel();

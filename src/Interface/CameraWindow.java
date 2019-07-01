@@ -4,6 +4,8 @@ import javax.swing.*;
 
 public class CameraWindow extends JFrame {
 
+    private static UPSCameraPanel upsCameraPanel;
+
     public CameraWindow() {
         super();
         this.setTitle("Vue Caméra");
@@ -12,9 +14,13 @@ public class CameraWindow extends JFrame {
     }
 
     public void runCamera() {
-        this.add(new UPSCameraPanel());
+        upsCameraPanel = new UPSCameraPanel();
+        this.add(upsCameraPanel);
         this.pack();
         this.setVisible(true);
     }
 
+    public static UPSCameraPanel getUpsCameraPanel() {
+        return upsCameraPanel;
+    }
 }
