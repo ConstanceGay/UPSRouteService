@@ -71,8 +71,7 @@ public class UPSCameraPanel extends JPanel {
                     g.drawString(topCodeOnMap + " -> " + gpsPoint, topCodePosition.getCol() - 20, topCodePosition.getRow() - 10);
 
                     //System.out.println(upsRouteService.getBuilding(coordinate.getX(), coordinate.getY()));
-                    Main.getMapWindow().getMapPanel().clearPointsToDraw();
-                    Main.getMapWindow().getMapPanel().addPointToDraw(gpsPoint);
+                    Main.getMapWindow().getMapPanel().setMobilePointToDraw(gpsPoint);
                     break;
             }
             g.drawOval((int)t.getCenterX() - 5, (int)t.getCenterY() - 5, 10, 10);
@@ -107,7 +106,7 @@ public class UPSCameraPanel extends JPanel {
 
         // calculer des proportions pour retrouver les tx et ty entre 0 et 1
         double tx = coordinate.getCol() / coordinateOrigin.getDistanceFrom(coordinateX);
-        double ty = 1.0 - coordinate.getRow() / coordinateOrigin.getDistanceFrom(coordinateY);
+        double ty = coordinate.getRow() / coordinateOrigin.getDistanceFrom(coordinateY);
 
         // appliquer tx et ty aux coordonnées GPS
         return new GPSPoint(gpsDownLeft.getX() + tx * GPS_BG_BD.getX() + ty * GPS_BG_HG.getX(),

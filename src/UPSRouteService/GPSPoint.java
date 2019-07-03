@@ -13,6 +13,7 @@ public class GPSPoint {
     }
 
     public GraphicsPoint getGraphicsPoint() {
+        // TODO: de la même manière que gps2vue()
         return null;
     }
 
@@ -30,6 +31,10 @@ public class GPSPoint {
 
     public void setLongitude(double longitude){
         this.longitude = longitude;
+    }
+
+    private double getSquaredSum() {
+        return longitude * longitude + latitude * latitude;
     }
 
     public String toString() {

@@ -1,18 +1,24 @@
 package UPSRouteService;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class Path {
+public class Path implements Iterable<Instruction> {
 
     private List<Instruction> instructions = new ArrayList<>();
 
-    public void add(Instruction instruction) {
+    void add(Instruction instruction) {
         instructions.add(instruction);
     }
 
     public String toString() {
         return instructions.toString();
+    }
+
+    @Override
+    public Iterator<Instruction> iterator() {
+        return instructions.iterator();
     }
 
 }
