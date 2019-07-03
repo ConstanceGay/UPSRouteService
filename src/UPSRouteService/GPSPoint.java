@@ -1,6 +1,5 @@
 package UPSRouteService;
 
-import Application.Main;
 import Interface.GraphicsPoint;
 
 public class GPSPoint {
@@ -13,29 +12,8 @@ public class GPSPoint {
         this.latitude = latitude;
     }
 
-    public GraphicsPoint getGraphicsPoint(GPSPoint upLeft, GPSPoint downLeft, GPSPoint downRight) {
-        GPSPoint gpsDownLeftToDownRight = new GPSPoint(downLeft.getLongitude() - downRight.getLongitude(),
-                downLeft.getLatitude() - downRight.getLatitude());
-        GPSPoint gpsDownLeftToUpLeft = new GPSPoint(upLeft.getLongitude() - downLeft.getLongitude(),
-                upLeft.getLatitude() - downLeft.getLatitude());
-
-        GPSPoint W = new GPSPoint(longitude - downLeft.getLongitude(), latitude - downLeft.getLatitude());
-
-        double A = gpsDownLeftToUpLeft.getSquaredSum();
-        double D = gpsDownLeftToDownRight.getSquaredSum();
-        double B = ((gpsDownLeftToDownRight.getLongitude() * gpsDownLeftToUpLeft.getLongitude())
-                + (gpsDownLeftToDownRight.getLatitude() * gpsDownLeftToUpLeft.getLatitude()));
-        double det = (A * D) - (B * B);
-
-        B = -1 * B;
-        det = 1 / det;
-
-        double tx = det * ((A * gpsDownLeftToDownRight.getLatitude() + B * gpsDownLeftToUpLeft.getLatitude()) * W.latitude
-                + (A * gpsDownLeftToDownRight.getLongitude() + B*gpsDownLeftToUpLeft.getLongitude()) * W.longitude);
-        double ty = det * ((B*gpsDownLeftToDownRight.getLatitude() + D * gpsDownLeftToUpLeft.getLatitude()) * W.latitude
-                + (B*gpsDownLeftToDownRight.getLongitude() + D*gpsDownLeftToUpLeft.getLongitude()) * W.longitude);
-
-        return new GraphicsPoint((int)(tx * Main.getMapWindow().getWidth()), (int)((1 - ty) * Main.getMapWindow().getHeight()));
+    public GraphicsPoint getGraphicsPoint() {
+        return null;
     }
 
     public double getLatitude() {
@@ -44,6 +22,14 @@ public class GPSPoint {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public void setLatitude(double latitude){
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude){
+        this.longitude = longitude;
     }
 
     private double getSquaredSum() {

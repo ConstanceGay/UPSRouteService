@@ -5,6 +5,8 @@ import UPSRouteService.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.RoundingMode;
@@ -12,7 +14,7 @@ import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-public class UPSMapPanel extends JPanel {
+public class UPSMapPanel extends JPanel implements MouseListener{
 
     private List<Vecteur2D> coordinates;
     private UPSRouteService upsRouteService = new UPSRouteService(this);
@@ -20,8 +22,11 @@ public class UPSMapPanel extends JPanel {
     private Coordinate gpsDownLeft;
     private Coordinate gpsDownRight;
     private Coordinate gpsUpLeft;
+    private Coordinate mouseCoordinate = new Coordinate(0,0);
+    private String building = "";
 
     UPSMapPanel(Location start, Location end) {
+        addMouseListener(this);
         loadGpsConfig();
         drawRoute(start, end);
 
@@ -29,6 +34,16 @@ public class UPSMapPanel extends JPanel {
         calibrationWindow.setVisible(true);
 
         this.setBackground(Color.BLACK);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent evt) {
+        mouseCoordinate.setX(evt.getPoint().x);
+        mouseCoordinate.setY(evt.getPoint().y);
+        Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY());
+        Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
+        building = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
+        repaint();
     }
 
     void setProfile(Profile profile) {
@@ -75,6 +90,9 @@ public class UPSMapPanel extends JPanel {
             e.printStackTrace();
         }
 
+        if (building != null) {
+            g.drawString(building, (int) mouseCoordinate.getX(), (int) mouseCoordinate.getY());
+        }
         g2.setStroke(new BasicStroke(2));
 
         g.setColor(Color.BLUE);
@@ -284,6 +302,12 @@ public class UPSMapPanel extends JPanel {
         }
 
     }
+
+    //Methods that have to be implemented with this interface
+    public void mousePressed(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {}
 
 }
 
