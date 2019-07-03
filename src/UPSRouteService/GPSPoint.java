@@ -24,6 +24,14 @@ public class GPSPoint {
         return longitude;
     }
 
+    public void setLatitude(double latitude){
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude){
+        this.longitude = longitude;
+    }
+
     public String toString() {
         return "[lat: " + latitude + ", lon: " + longitude + "]";
     }
