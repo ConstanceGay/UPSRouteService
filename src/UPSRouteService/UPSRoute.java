@@ -33,6 +33,38 @@ public class UPSRoute {
         }
     }
 
+    //Returns the length of a path in meters
+    public int getDistance(){
+        JSONObject jsonObject = json;
+        int int_dist;
+        try {
+            jsonObject = JSONManager.getJSONObject(jsonObject, "features");
+            jsonObject = JSONManager.getJSONObject(jsonObject, "properties");
+            jsonObject = JSONManager.getJSONObject(jsonObject, "summary");
+            int_dist = jsonObject.getInt("distance");
+            return int_dist;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    //Returns the duration of path in minutes
+    public int getLength(){
+        JSONObject jsonObject = json;
+        int int_duration;
+        try {
+            jsonObject = JSONManager.getJSONObject(jsonObject, "features");
+            jsonObject = JSONManager.getJSONObject(jsonObject, "properties");
+            jsonObject = JSONManager.getJSONObject(jsonObject, "summary");
+            int_duration = jsonObject.getInt("duration");
+            return int_duration/60;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public List<Vecteur2D> getCoordinates() {
         if (postCall) {
             // TODO : récupérer les coordonnées depuis une requête HTTP GET
