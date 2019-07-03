@@ -50,7 +50,7 @@ public class UPSRoute {
     }
 
     //Returns the duration of path in minutes
-    public int getLength(){
+    public int getDuration(){
         JSONObject jsonObject = json;
         int int_duration;
         try {

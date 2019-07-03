@@ -76,7 +76,7 @@ public class MapWindow extends JFrame {
         NavigationWindow() {
             super();
             this.setTitle("Navigation UPS");
-            this.setSize(440, 190);
+            this.setSize(440, 240);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             this.setResizable(true);
 
@@ -88,6 +88,8 @@ public class MapWindow extends JFrame {
             JPanel profilePanel = new JPanel();
             JPanel startPanel = new JPanel();
             JPanel endPanel = new JPanel();
+            JPanel durationPanel = new JPanel();
+            JPanel distancePanel = new JPanel();
 
             JLabel profileLabel = new JLabel("Profil");
             profileLabel.setPreferredSize(new Dimension(50, 20));
@@ -126,7 +128,18 @@ public class MapWindow extends JFrame {
             navigationPanel.add(jButton);
 
             // Espacement entre le bouton et le bas de la fenêtre
+            JLabel durationLabel = new JLabel("Durée : " + upsMapPanel.getDuration()+" minute(s)");
+            durationLabel.setPreferredSize(new Dimension(150, 20));
+            durationPanel.add(durationLabel);
+
+            JLabel distanceLabel = new JLabel("Distance : " + upsMapPanel.getDistance()+" metres");
+            distanceLabel.setPreferredSize(new Dimension(150, 20));
+            distancePanel.add(distanceLabel);
+
+            navigationPanel.add(durationPanel);
+            navigationPanel.add(distancePanel);
             navigationPanel.add(new JPanel());
+
 
             this.add(navigationPanel);
 

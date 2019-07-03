@@ -27,7 +27,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private Coordinate mouseCoordinate = new Coordinate(0,0);
     private String building = "";
     private int distance;
-    private int length;
+    private int duration;
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
@@ -61,6 +61,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         if (upsRoute != null) {
             steps = upsRoute.getSteps();
             coordinates = upsRoute.getCoordinates();
+            distance = upsRoute.getDistance();
+            duration = upsRoute.getDuration();
         }
         else
             JOptionPane.showMessageDialog(this,
@@ -192,6 +194,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     Path getSteps() {
         return steps;
     }
+
+    int getDuration() { return duration; }
+
+    int getDistance(){ return distance;}
 
     void setMobilePointToDraw(GPSPoint gpsPoint) {
         mobilePointToDraw = gpsPoint;
