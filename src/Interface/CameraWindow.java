@@ -23,4 +23,5 @@ public class CameraWindow extends JFrame {
     public static UPSCameraPanel getUpsCameraPanel() {
         return upsCameraPanel;
     }
+
 }

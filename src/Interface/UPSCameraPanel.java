@@ -107,7 +107,7 @@ public class UPSCameraPanel extends JPanel {
 
         // calculer des proportions pour retrouver les tx et ty entre 0 et 1
         double tx = coordinate.getCol() / coordinateOrigin.getDistanceFrom(coordinateX);
-        double ty = 1.0 - coordinate.getRow() / coordinateOrigin.getDistanceFrom(coordinateY);
+        double ty = coordinate.getRow() / coordinateOrigin.getDistanceFrom(coordinateY);
 
         // appliquer tx et ty aux coordonnées GPS
         return new GPSPoint(gpsDownLeft.getX() + tx * GPS_BG_BD.getX() + ty * GPS_BG_HG.getX(),

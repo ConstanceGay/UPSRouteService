@@ -10,7 +10,7 @@ public class GraphicsPoint {
         this.col = 0;
     }
 
-    GraphicsPoint(int col, int row) {
+    public GraphicsPoint(int col, int row) {
         this.col = col;
         this.row = row;
     }

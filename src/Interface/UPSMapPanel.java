@@ -92,8 +92,10 @@ public class UPSMapPanel extends JPanel {
 
         g.setColor(Color.RED);
         for (GPSPoint coordinate : pointsToDraw) {
-            Vecteur2D vecteur2D = new Vecteur2D(coordinate.getLongitude(), coordinate.getLatitude());
-            //System.out.println("point to draw : " + vecteur2D.gps2vue());
+            Vecteur2D vecteur2D = new Vecteur2D(coordinate.getLongitude(), coordinate.getLatitude(),
+                    gpsDownLeft,
+                    gpsDownRight,
+                    gpsUpLeft);
             g.fillOval((int)vecteur2D.gps2vue().getX(), (int)vecteur2D.gps2vue().getY(), 10, 10);
         }
     }
