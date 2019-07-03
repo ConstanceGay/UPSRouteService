@@ -71,8 +71,7 @@ public class UPSCameraPanel extends JPanel {
                     g.drawString(topCodeOnMap + " -> " + gpsPoint, topCodePosition.getCol() - 20, topCodePosition.getRow() - 10);
 
                     //System.out.println(upsRouteService.getBuilding(coordinate.getX(), coordinate.getY()));
-                    Main.getMapWindow().getMapPanel().clearPointsToDraw();
-                    Main.getMapWindow().getMapPanel().addPointToDraw(gpsPoint);
+                    Main.getMapWindow().getMapPanel().setMobilePointToDraw(gpsPoint);
                     break;
             }
             g.drawOval((int)t.getCenterX() - 5, (int)t.getCenterY() - 5, 10, 10);

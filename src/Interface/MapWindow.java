@@ -1,12 +1,15 @@
 package Interface;
 
+import UPSRouteService.Instruction;
 import UPSRouteService.Location;
+import UPSRouteService.Path;
 import UPSRouteService.Profile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 
 public class MapWindow extends JFrame {
 
@@ -67,13 +70,20 @@ public class MapWindow extends JFrame {
 
     class NavigationWindow extends JFrame {
 
+        private DefaultListModel<Instruction> listSelectionModel = new DefaultListModel<>();
+        private JList<Instruction> jList;
+
         NavigationWindow() {
             super();
             this.setTitle("Navigation UPS");
-            this.setSize(280, 174);
+            this.setSize(440, 190);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.setResizable(false);
-            this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
+            this.setResizable(true);
+
+            this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS));
+
+            JPanel navigationPanel = new JPanel();
+            navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.PAGE_AXIS));
 
             JPanel profilePanel = new JPanel();
             JPanel startPanel = new JPanel();
@@ -103,19 +113,58 @@ public class MapWindow extends JFrame {
             endCombo.setSelectedIndex(1);
             endPanel.add(endCombo);
 
-            this.add(profilePanel);
-            this.add(startPanel);
-            this.add(endPanel);
+            navigationPanel.add(profilePanel);
+            navigationPanel.add(startPanel);
+            navigationPanel.add(endPanel);
 
             JButton jButton = new JButton("Valider");
             jButton.addActionListener(e -> {
                 upsMapPanel.setProfile((Profile)profileCombo.getSelectedItem());
                 upsMapPanel.drawRoute((Location)startCombo.getSelectedItem(), (Location)endCombo.getSelectedItem());
+                refreshJList();
             });
-            this.add(jButton);
-            this.add(new JPanel());
+            navigationPanel.add(jButton);
+
+            // Espacement entre le bouton et le bas de la fenêtre
+            navigationPanel.add(new JPanel());
+
+            this.add(navigationPanel);
+
+            Path steps = upsMapPanel.getSteps();
+            listSelectionModel.removeAllElements();
+            steps.forEach(i -> listSelectionModel.addElement(i));
+
+            jList = new JList<>();
+            jList.setModel(listSelectionModel);
+            jList.addListSelectionListener(e -> {
+                Instruction instruction = jList.getSelectedValue();
+                if (instruction != null) {
+                    upsMapPanel.clearWayPointsToDraw();
+
+                    // Retourne les points sous la forme [premier_point, dernier_point]
+                    List<Integer> list = instruction.getWayPoints();
+
+                    // Ajout de tous les autres points dans la liste entre les deux bornes
+                    for (int i = list.get(0) + 1; i < list.get(1); i++) {
+                        if (!list.contains(i))
+                            list.add(i);
+                    }
+
+                    upsMapPanel.addAllWayPointsToDraw(instruction.getWayPoints());
+                }
+            });
+
+            JScrollPane jScrollPane = new JScrollPane(jList);
+            this.add(jScrollPane);
 
             this.setVisible(true);
+        }
+
+        private void refreshJList() {
+            Path steps = upsMapPanel.getSteps();
+            listSelectionModel.removeAllElements();
+            steps.forEach(i -> listSelectionModel.addElement(i));
+            jList.setModel(listSelectionModel);
         }
 
     }

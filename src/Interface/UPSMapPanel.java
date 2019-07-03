@@ -18,7 +18,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     private List<Vecteur2D> coordinates;
     private UPSRouteService upsRouteService = new UPSRouteService(this);
-    private List<GPSPoint> pointsToDraw = new LinkedList<GPSPoint>();
+    private GPSPoint mobilePointToDraw;
+    private List<Integer> wayPointsToDraw = new LinkedList<>();
+    private Path steps;
     private Coordinate gpsDownLeft;
     private Coordinate gpsDownRight;
     private Coordinate gpsUpLeft;
@@ -54,8 +56,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
         if (upsRoute != null) {
+            steps = upsRoute.getSteps();
             coordinates = upsRoute.getCoordinates();
-            System.out.println(upsRoute.getSteps());
         }
         else
             JOptionPane.showMessageDialog(this,
@@ -68,7 +70,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        //g2.rotate(Math.toRadians(-55), this.getWidth() / 2, this.getHeight() / 2);
 
         try {
             BufferedImage image = ImageIO.read(new File("img/ups-map-real-sideways.png"));
@@ -100,7 +101,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         //g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
 
         for (int i = 0; i < coordinates.size() - 1; i++) {
-            g2.setColor(Color.RED);
+            if (wayPointsToDraw.contains(i))
+                g2.setColor(Color.ORANGE);
+            else
+                g2.setColor(Color.RED);
+
             g2.drawLine((int)coordinates.get(i).gps2vue().getX(), (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX(), (int)coordinates.get(i + 1).gps2vue().getY());
         }
 
@@ -108,9 +113,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
         //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
 
-        g.setColor(Color.RED);
-        for (GPSPoint coordinate : pointsToDraw) {
-            Vecteur2D vecteur2D = new Vecteur2D(coordinate.getLongitude(), coordinate.getLatitude(),
+        if (mobilePointToDraw != null) {
+            g.setColor(Color.RED);
+            Vecteur2D vecteur2D = new Vecteur2D(mobilePointToDraw.getLongitude(), mobilePointToDraw.getLatitude(),
                     gpsDownLeft,
                     gpsDownRight,
                     gpsUpLeft);
@@ -181,12 +186,20 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return gpsUpLeft;
     }
 
-    void addPointToDraw(GPSPoint coordinate) {
-        pointsToDraw.add(coordinate);
+    Path getSteps() {
+        return steps;
     }
 
-    void clearPointsToDraw() {
-        pointsToDraw.clear();
+    void setMobilePointToDraw(GPSPoint gpsPoint) {
+        mobilePointToDraw = gpsPoint;
+    }
+
+    void addAllWayPointsToDraw(List<Integer> points) {
+        wayPointsToDraw.addAll(points);
+    }
+
+    void clearWayPointsToDraw() {
+        wayPointsToDraw.clear();
     }
 
     class CalibrationWindow extends JFrame {

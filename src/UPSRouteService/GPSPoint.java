@@ -13,6 +13,7 @@ public class GPSPoint {
     }
 
     public GraphicsPoint getGraphicsPoint() {
+        // TODO: de la même manière que gps2vue()
         return null;
     }
 
