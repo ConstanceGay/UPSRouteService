@@ -46,7 +46,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         mouseCoordinate.setY(evt.getPoint().y);
         Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY(),gpsDownLeft,gpsDownRight,gpsUpLeft);
         Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
-        System.out.println(mouse_GPS.toString());
         building = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
         repaint();
     }

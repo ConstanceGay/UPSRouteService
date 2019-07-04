@@ -71,6 +71,8 @@ public class MapWindow extends JFrame {
     class NavigationWindow extends JFrame {
 
         private DefaultListModel<Instruction> listSelectionModel = new DefaultListModel<>();
+        private JLabel distanceLabel;
+        private JLabel durationLabel;
         private JList<Instruction> jList;
 
         NavigationWindow() {
@@ -128,11 +130,11 @@ public class MapWindow extends JFrame {
             navigationPanel.add(jButton);
 
             // Espacement entre le bouton et le bas de la fenêtre
-            JLabel durationLabel = new JLabel("Durée : " + upsMapPanel.getDuration()+" minute(s)");
+            durationLabel = new JLabel("Durée : " + upsMapPanel.getDuration()+" minute(s)");
             durationLabel.setPreferredSize(new Dimension(150, 20));
             durationPanel.add(durationLabel);
 
-            JLabel distanceLabel = new JLabel("Distance : " + upsMapPanel.getDistance()+" metres");
+            distanceLabel = new JLabel("Distance : " + upsMapPanel.getDistance()+" metres");
             distanceLabel.setPreferredSize(new Dimension(150, 20));
             distancePanel.add(distanceLabel);
 
@@ -174,6 +176,8 @@ public class MapWindow extends JFrame {
         }
 
         private void refreshJList() {
+            durationLabel.setText("Durée : " + upsMapPanel.getDuration()+" minute(s)");
+            distanceLabel.setText("Distance : " + upsMapPanel.getDistance()+" metres");
             Path steps = upsMapPanel.getSteps();
             listSelectionModel.removeAllElements();
             steps.forEach(i -> listSelectionModel.addElement(i));
