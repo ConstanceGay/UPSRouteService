@@ -111,7 +111,10 @@ public class UPSRouteService {
         if (jsonObject != null) {
             try {
                 jsonObject = JSONManager.getJSONObject(jsonObject, "features");
+                JSONObject jsonObject2 = JSONManager.getJSONObject(jsonObject, "geometry");
+                System.out.print(jsonObject2.get("coordinates").toString());
                 jsonObject = JSONManager.getJSONObject(jsonObject, "properties");
+                System.out.print(jsonObject.get("name").toString()+"\n");
                 return jsonObject.get("name").toString();
             } catch (JSONException e) {
                 e.printStackTrace();

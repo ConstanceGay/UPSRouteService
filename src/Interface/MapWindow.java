@@ -78,7 +78,7 @@ public class MapWindow extends JFrame {
         NavigationWindow() {
             super();
             this.setTitle("Navigation UPS");
-            this.setSize(440, 240);
+            this.setSize(600, 240);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             this.setResizable(true);
 
@@ -171,7 +171,6 @@ public class MapWindow extends JFrame {
 
             JScrollPane jScrollPane = new JScrollPane(jList);
             this.add(jScrollPane);
-
             this.setVisible(true);
         }
 

@@ -56,6 +56,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     }
 
     void drawRoute(Location start, Location end) {
+        mobileStartPointToDraw = null;
+        mobileEndPointToDraw = null;
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
         if (upsRoute != null) {
@@ -222,7 +224,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     void setMobileStartPointToDraw(GPSPoint gpsPoint) {
         if(mobileStartPointToDraw != null) {
             Boolean isDif = (gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude());
-            if (isDif && gpsPoint != null) {
+            if (isDif) {
                 mobileStartPointToDraw = gpsPoint;
                 if (mobileEndPointToDraw != null) {
                     drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
@@ -236,7 +238,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     void setMobileEndPointToDraw(GPSPoint gpsPoint) {
         if(mobileEndPointToDraw != null) {
             Boolean isDif = (gpsPoint.getLongitude() != mobileEndPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileEndPointToDraw.getLatitude());
-            if (isDif && gpsPoint != null) {
+            if (isDif) {
                 mobileEndPointToDraw = gpsPoint;
                 if (mobileStartPointToDraw != null) {
                     drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
@@ -374,6 +376,5 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     public void mouseReleased(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
-
 }
 
