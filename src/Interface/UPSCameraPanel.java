@@ -67,11 +67,20 @@ public class UPSCameraPanel extends JPanel {
                     GraphicsPoint topCodeOnMap = getCoordinateOnMap(t);
                     GPSPoint gpsPoint = getGpsFromCoordinateOnMap(topCodeOnMap);
 
-                    System.out.println(gpsPoint);
                     g.drawString(topCodeOnMap + " -> " + gpsPoint, topCodePosition.getCol() - 20, topCodePosition.getRow() - 10);
 
                     //System.out.println(upsRouteService.getBuilding(coordinate.getX(), coordinate.getY()));
-                    Main.getMapWindow().getMapPanel().setMobilePointToDraw(gpsPoint);
+                    Main.getMapWindow().getMapPanel().setMobileStartPointToDraw(gpsPoint);
+                    break;
+                case 55:
+                    GraphicsPoint topCodePosition2 = new GraphicsPoint((int)t.getCenterX(), (int)t.getCenterY());
+                    GraphicsPoint topCodeOnMap2 = getCoordinateOnMap(t);
+                    GPSPoint gpsPoint2 = getGpsFromCoordinateOnMap(topCodeOnMap2);
+
+                    g.drawString(topCodeOnMap2 + " -> " + gpsPoint2, topCodePosition2.getCol() - 20, topCodePosition2.getRow() - 10);
+
+                    //System.out.println(upsRouteService.getBuilding(coordinate.getX(), coordinate.getY()));
+                    Main.getMapWindow().getMapPanel().setMobileEndPointToDraw(gpsPoint2);
                     break;
             }
             g.drawOval((int)t.getCenterX() - 5, (int)t.getCenterY() - 5, 10, 10);

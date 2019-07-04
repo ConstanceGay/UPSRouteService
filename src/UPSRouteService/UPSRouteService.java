@@ -43,6 +43,24 @@ public class UPSRouteService {
         }
     }
 
+    public UPSRoute getRoute(GPSPoint start, GPSPoint end) {
+        JSONObject jsonObject = null;
+
+        try {
+            String coordinates = "&start=" + start.getLongitude()+"," +start.getLatitude()+ "&end=" + end.getLongitude()+"," +end.getLatitude();
+            URL url = new URL("https://api.openrouteservice.org/v2/directions/" + profile.getAPIProfileName() + "?api_key=" + API_KEY + coordinates);
+            jsonObject = sendGETRequest(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (jsonObject != null) {
+            return new UPSRoute(jsonObject, upsMapPanel, false);
+        } else {
+            return null;
+        }
+    }
+
     public UPSRoute getRoute(Location start, Location end, String language) {
         if (language.equals("fr")) {
             JSONObject jsonObject = null;

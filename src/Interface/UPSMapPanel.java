@@ -18,7 +18,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     private List<Vecteur2D> coordinates;
     private UPSRouteService upsRouteService = new UPSRouteService(this);
-    private GPSPoint mobilePointToDraw;
+    private GPSPoint mobileStartPointToDraw;
+    private GPSPoint mobileEndPointToDraw;
     private List<Integer> wayPointsToDraw = new LinkedList<>();
     private Path steps;
     private Coordinate gpsDownLeft;
@@ -70,6 +71,17 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     JOptionPane.ERROR_MESSAGE);
     }
 
+    void drawRoute(GPSPoint start, GPSPoint end) {
+        UPSRoute upsRoute = upsRouteService.getRoute(start, end);
+
+        if (upsRoute != null) {
+            steps = upsRoute.getSteps();
+            coordinates = upsRoute.getCoordinates();
+            distance = upsRoute.getDistance();
+            duration = upsRoute.getDuration();
+        }
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -117,9 +129,18 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
         //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
 
-        if (mobilePointToDraw != null) {
+        if (mobileStartPointToDraw != null) {
+            g.setColor(Color.GREEN);
+            Vecteur2D vecteur2D = new Vecteur2D(mobileStartPointToDraw.getLongitude(), mobileStartPointToDraw.getLatitude(),
+                    gpsDownLeft,
+                    gpsDownRight,
+                    gpsUpLeft);
+            g.fillOval((int)vecteur2D.gps2vue().getX(), (int)vecteur2D.gps2vue().getY(), 10, 10);
+        }
+
+        if (mobileEndPointToDraw != null) {
             g.setColor(Color.RED);
-            Vecteur2D vecteur2D = new Vecteur2D(mobilePointToDraw.getLongitude(), mobilePointToDraw.getLatitude(),
+            Vecteur2D vecteur2D = new Vecteur2D(mobileEndPointToDraw.getLongitude(), mobileEndPointToDraw.getLatitude(),
                     gpsDownLeft,
                     gpsDownRight,
                     gpsUpLeft);
@@ -198,8 +219,32 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     int getDistance(){ return distance;}
 
-    void setMobilePointToDraw(GPSPoint gpsPoint) {
-        mobilePointToDraw = gpsPoint;
+    void setMobileStartPointToDraw(GPSPoint gpsPoint) {
+        if(mobileStartPointToDraw != null) {
+            Boolean isDif = (gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude());
+            if (isDif && gpsPoint != null) {
+                mobileStartPointToDraw = gpsPoint;
+                if (mobileEndPointToDraw != null) {
+                    drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
+                }
+            }
+        } else{
+            mobileStartPointToDraw = gpsPoint;
+        }
+    }
+
+    void setMobileEndPointToDraw(GPSPoint gpsPoint) {
+        if(mobileEndPointToDraw != null) {
+            Boolean isDif = (gpsPoint.getLongitude() != mobileEndPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileEndPointToDraw.getLatitude());
+            if (isDif && gpsPoint != null) {
+                mobileEndPointToDraw = gpsPoint;
+                if (mobileStartPointToDraw != null) {
+                    drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
+                }
+            }
+        } else{
+            mobileEndPointToDraw = gpsPoint;
+        }
     }
 
     void addAllWayPointsToDraw(List<Integer> points) {
