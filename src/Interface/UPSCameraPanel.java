@@ -7,6 +7,7 @@ import UPSRouteService.GPSPoint;
 import Utilities.Scanner;
 import Utilities.TopCode;
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamResolution;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,9 +27,18 @@ public class UPSCameraPanel extends JPanel {
 
     UPSCameraPanel() {
         super();
-        this.setPreferredSize(new Dimension(640, 480));
+        this.setPreferredSize(new Dimension(1600, 1200));
 
-        webcam.setViewSize(new Dimension(640, 480));
+        Dimension[] nonStandardResolutions = new Dimension[] {
+                WebcamResolution.PAL.getSize(),
+                WebcamResolution.UXGA.getSize(),
+                new Dimension(2000, 1000),
+                new Dimension(1000, 500),
+        };
+
+        webcam.setCustomViewSizes(nonStandardResolutions);
+        webcam.setViewSize(WebcamResolution.UXGA.getSize());
+        webcam.open();
         webcam.open();
 
         int delay = 2000; // milliseconds
