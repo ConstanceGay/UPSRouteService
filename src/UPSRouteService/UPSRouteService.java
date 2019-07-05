@@ -102,26 +102,27 @@ public class UPSRouteService {
         JSONObject jsonObject = null;
 
         try {
-            URL url = new URL("https://api.openrouteservice.org/geocode/reverse?api_key="  + API_KEY + "&point.lon=" + longitude + "&point.lat=" + latitude + "&boundary.circle.radius=0.2&size=1&layers=venue&boundary.country=fr");
+            URL url = new URL("https://api.openrouteservice.org/geocode/reverse?api_key="  + API_KEY + "&point.lon=" + longitude + "&point.lat=" + latitude + "&boundary.circle.radius=0.05&size=1&layers=venue&boundary.country=fr");
             jsonObject = sendGETRequest(url);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
-        if (jsonObject != null) {
-            try {
+        try {
+            if (jsonObject != null && !jsonObject.get("features").toString().equals("[]")) {
                 jsonObject = JSONManager.getJSONObject(jsonObject, "features");
                 JSONObject jsonObject2 = JSONManager.getJSONObject(jsonObject, "geometry");
-                System.out.print(jsonObject2.get("coordinates").toString());
+                //System.out.println(jsonObject2.get("coordinates").toString());
+
                 jsonObject = JSONManager.getJSONObject(jsonObject, "properties");
-                System.out.print(jsonObject.get("name").toString()+"\n");
+                //System.out.print(jsonObject.get("name").toString()+"\n");
                 return jsonObject.get("name").toString();
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
 
     public void setProfile(Profile profile) {

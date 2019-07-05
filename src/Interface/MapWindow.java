@@ -142,7 +142,6 @@ public class MapWindow extends JFrame {
             navigationPanel.add(distancePanel);
             navigationPanel.add(new JPanel());
 
-
             this.add(navigationPanel);
 
             Path steps = upsMapPanel.getSteps();

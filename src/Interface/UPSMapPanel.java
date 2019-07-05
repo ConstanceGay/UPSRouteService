@@ -29,12 +29,14 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private String building = "";
     private int distance;
     private int duration;
+    private InstructionWindow instructionWindow;
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
         loadGpsConfig();
         drawRoute(start, end);
 
+        instructionWindow = new InstructionWindow(0,0,new Path());
         CalibrationWindow calibrationWindow = new CalibrationWindow();
         calibrationWindow.setVisible(true);
 
@@ -77,10 +79,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
         if (upsRoute != null) {
-            steps = upsRoute.getSteps();
+            String startBuilding = upsRouteService.getBuilding(start.getLongitude(),start.getLatitude());
+            String endBuilding = upsRouteService.getBuilding(end.getLongitude(),end.getLatitude());
+            instructionWindow.refresh(upsRoute.getDistance(),upsRoute.getDuration(),upsRoute.getSteps(),startBuilding,endBuilding);
+            instructionWindow.setVisible(true);
             coordinates = upsRoute.getCoordinates();
-            distance = upsRoute.getDistance();
-            duration = upsRoute.getDuration();
         }
     }
 
