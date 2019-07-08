@@ -19,7 +19,7 @@ public class MapWindow extends JFrame {
     public MapWindow() {
         super();
         this.setTitle("Maquette UPS");
-        this.setSize(1090, 634);
+        this.setSize(940, 655);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
 
@@ -33,7 +33,7 @@ public class MapWindow extends JFrame {
                         frame.dispose();
                         frame.setExtendedState(JFrame.NORMAL);
                         frame.setUndecorated(false);
-                        frame.setSize(702, 682);
+                        frame.setSize(940, 655);
                         frame.setVisible(true);
                         isFullScreen = false;
                     } else {

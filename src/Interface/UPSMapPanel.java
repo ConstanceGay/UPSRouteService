@@ -93,7 +93,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         Graphics2D g2 = (Graphics2D) g;
 
         try {
-            BufferedImage image = ImageIO.read(new File("img/ups-map-real-sideways.png"));
+            BufferedImage image = ImageIO.read(new File("img/ups-map-9x6.png"));
             double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
 
             int scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
@@ -196,9 +196,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             fileInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
             if (e instanceof InvalidClassException) {
-                gpsUpLeft = new Coordinate(1.46125, 43.5654);
-                gpsDownLeft = new Coordinate(1.46127, 43.555555);
-                gpsDownRight = new Coordinate(1.4749, 43.5556);
+                gpsUpLeft = new Coordinate(1.468209, 43.566174);
+                gpsDownLeft = new Coordinate(1.461643, 43.562777);
+                gpsDownRight = new Coordinate(1.468724, 43.555375);
             }
             e.printStackTrace();
         }

@@ -17,11 +17,10 @@ import java.util.List;
 
 public class UPSCameraPanel extends JPanel {
 
-    private Webcam webcam = Webcam.getWebcams().get(1);
+    private Webcam webcam = Webcam.getWebcams().get(Webcam.getWebcams().size() - 1);
     private GraphicsPoint coordinateX = new GraphicsPoint();
     private GraphicsPoint coordinateY = new GraphicsPoint();
     private GraphicsPoint coordinateOrigin = new GraphicsPoint();
-    private UPSRouteService upsRouteService = new UPSRouteService();
     private double mapWidth;
     private double mapHeight;
 
