@@ -76,7 +76,7 @@ public class Vecteur2D {
         double tx = det * ((A*GPS_BG_BD.getX() + B*GPS_BG_HG.getX())*W.x + (A*GPS_BG_BD.getY() + B*GPS_BG_HG.getY())*W.y);
         double ty = det * ((B*GPS_BG_BD.getX() + D*GPS_BG_HG.getX())*W.x + (B*GPS_BG_BD.getY() + D*GPS_BG_HG.getY())*W.y);
 
-        pt.x = tx * Main.getMapWindow().getWidth();
+        pt.x = tx * Main.getMapWindow().getMapPanel().getScaleWidth();
         pt.y = (1-ty) * Main.getMapWindow().getHeight();
 
         return pt;

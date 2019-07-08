@@ -26,18 +26,14 @@ public class UPSCameraPanel extends JPanel {
 
     UPSCameraPanel() {
         super();
-        this.setPreferredSize(new Dimension(1600, 1200));
+        this.setPreferredSize(new Dimension(1600, 896));
 
         Dimension[] nonStandardResolutions = new Dimension[] {
-                WebcamResolution.PAL.getSize(),
-                WebcamResolution.UXGA.getSize(),
-                new Dimension(2000, 1000),
-                new Dimension(1000, 500),
+                new Dimension(1600, 896)
         };
 
         webcam.setCustomViewSizes(nonStandardResolutions);
-        webcam.setViewSize(WebcamResolution.UXGA.getSize());
-        webcam.open();
+        webcam.setViewSize(nonStandardResolutions[0].getSize());
         webcam.open();
 
         int delay = 2000; // milliseconds

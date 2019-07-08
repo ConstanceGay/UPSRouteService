@@ -30,6 +30,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private int distance;
     private int duration;
     private InstructionWindow instructionWindow;
+    private int scaleWidth;
+    private int xOffset;
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
@@ -96,7 +98,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             BufferedImage image = ImageIO.read(new File("img/ups-map-9x6.png"));
             double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
 
-            int scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
+            scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
             int scaleHeight = (int) Math.round(image.getHeight() * scaleFactor);
 
             Image scaled = image.getScaledInstance(scaleWidth, scaleHeight, Image.SCALE_SMOOTH);
@@ -104,10 +106,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             int width = getWidth() - 1;
             int height = getHeight() - 1;
 
-            int x = (width - scaled.getWidth(this)) / 2;
+            xOffset = (width - scaled.getWidth(this)) / 2;
             int y = (height - scaled.getHeight(this)) / 2;
 
-            g.drawImage(scaled, x, y, this);
+            g.drawImage(scaled, xOffset, y, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +120,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         g2.setStroke(new BasicStroke(2));
 
         g.setColor(Color.BLUE);
-        g.drawOval((int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2, 4, 4);
+        g.drawOval((int)coordinates.get(0).gps2vue().getX() - 2 + xOffset, (int)coordinates.get(0).gps2vue().getY() - 2, 4, 4);
         //g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
 
         for (int i = 0; i < coordinates.size() - 1; i++) {
@@ -127,11 +129,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             else
                 g2.setColor(Color.RED);
 
-            g2.drawLine((int)coordinates.get(i).gps2vue().getX(), (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX(), (int)coordinates.get(i + 1).gps2vue().getY());
+            g2.drawLine((int)coordinates.get(i).gps2vue().getX() + xOffset, (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX() + xOffset, (int)coordinates.get(i + 1).gps2vue().getY());
         }
 
         g.setColor(Color.BLUE);
-        g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
+        g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2 + xOffset, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
         //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
 
         if (mobileStartPointToDraw != null) {
@@ -140,7 +142,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     gpsDownLeft,
                     gpsDownRight,
                     gpsUpLeft);
-            g.fillOval((int)vecteur2D.gps2vue().getX(), (int)vecteur2D.gps2vue().getY(), 10, 10);
+            g.fillOval((int)vecteur2D.gps2vue().getX() + xOffset, (int)vecteur2D.gps2vue().getY(), 10, 10);
         }
 
         if (mobileEndPointToDraw != null) {
@@ -149,7 +151,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     gpsDownLeft,
                     gpsDownRight,
                     gpsUpLeft);
-            g.fillOval((int)vecteur2D.gps2vue().getX(), (int)vecteur2D.gps2vue().getY(), 10, 10);
+            g.fillOval((int)vecteur2D.gps2vue().getX() + xOffset, (int)vecteur2D.gps2vue().getY(), 10, 10);
         }
     }
 
@@ -258,6 +260,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     void clearWayPointsToDraw() {
         wayPointsToDraw.clear();
+    }
+
+    public int getScaleWidth() {
+        return scaleWidth;
     }
 
     class CalibrationWindow extends JFrame {
