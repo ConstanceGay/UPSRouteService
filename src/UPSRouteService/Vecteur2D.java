@@ -29,6 +29,14 @@ public class Vecteur2D {
         GPS_HG = gpsUpLeft;
     }
 
+    public Vecteur2D(double dx, double dy, GPSPoint gpsDownLeft, GPSPoint gpsDownRight, GPSPoint gpsUpLeft) {
+        x = dx;
+        y = dy;
+        GPS_BD = new Coordinate(gpsDownRight.getLongitude(), gpsDownRight.getLatitude());
+        GPS_BG = new Coordinate(gpsDownLeft.getLongitude(), gpsDownLeft.getLatitude());
+        GPS_HG = new Coordinate(gpsUpLeft.getLongitude(), gpsUpLeft.getLatitude());
+    }
+
     public double norme() {
         return (Math.sqrt(x*x + y*y));
     }

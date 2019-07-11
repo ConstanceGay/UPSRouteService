@@ -1,11 +1,9 @@
 package UPSRouteService;
 
-import Interface.UPSMapPanel;
 import Utilities.JSONManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -14,16 +12,12 @@ import java.nio.charset.StandardCharsets;
 
 public class UPSRouteService {
 
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String API_KEY = "5b3ce3597851110001cf6248e17e16eae3fd4c47a7f3738528afba68";
     private static final int SUCCESSFUL_REQUEST = 200;
     private Profile profile = Profile.WALKING;
-    private UPSMapPanel upsMapPanel;
 
     public UPSRouteService() {
-    }
-
-    public UPSRouteService(UPSMapPanel upsMapPanel) {
-        this.upsMapPanel = upsMapPanel;
     }
 
     public UPSRoute getRoute(Location start, Location end) {
@@ -37,7 +31,7 @@ public class UPSRouteService {
         }
 
         if (jsonObject != null) {
-            return new UPSRoute(jsonObject, upsMapPanel, false);
+            return new UPSRoute(jsonObject, false);
         } else {
             return null;
         }
@@ -55,12 +49,13 @@ public class UPSRouteService {
         }
 
         if (jsonObject != null) {
-            return new UPSRoute(jsonObject, upsMapPanel, false);
+            return new UPSRoute(jsonObject, false);
         } else {
             return null;
         }
     }
 
+    @SuppressWarnings("unused")
     public UPSRoute getRoute(Location start, Location end, String language) {
         if (language.equals("fr")) {
             JSONObject jsonObject = null;
@@ -111,7 +106,7 @@ public class UPSRouteService {
         try {
             if (jsonObject != null && !jsonObject.get("features").toString().equals("[]")) {
                 jsonObject = JSONManager.getJSONObject(jsonObject, "features");
-                JSONObject jsonObject2 = JSONManager.getJSONObject(jsonObject, "geometry");
+                //JSONObject jsonObject2 = JSONManager.getJSONObject(jsonObject, "geometry");
                 //System.out.println(jsonObject2.get("coordinates").toString());
 
                 jsonObject = JSONManager.getJSONObject(jsonObject, "properties");

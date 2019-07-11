@@ -16,15 +16,15 @@ import java.util.List;
 
 public class UPSMapPanel extends JPanel implements MouseListener{
 
-    private List<Vecteur2D> coordinates;
-    private UPSRouteService upsRouteService = new UPSRouteService(this);
+    private List<GPSPoint> coordinates;
+    private UPSRouteService upsRouteService = new UPSRouteService();
     private GPSPoint mobileStartPointToDraw;
     private GPSPoint mobileEndPointToDraw;
     private List<Integer> wayPointsToDraw = new LinkedList<>();
     private Path steps;
-    private Coordinate gpsDownLeft;
-    private Coordinate gpsDownRight;
-    private Coordinate gpsUpLeft;
+    private GPSPoint gpsDownLeft;
+    private GPSPoint gpsDownRight;
+    private GPSPoint gpsUpLeft;
     private Coordinate mouseCoordinate = new Coordinate(0,0);
     private String building = "";
     private int distance;
@@ -77,7 +77,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     JOptionPane.ERROR_MESSAGE);
     }
 
-    void drawRoute(GPSPoint start, GPSPoint end) {
+    private void drawRoute(GPSPoint start, GPSPoint end) {
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
         if (upsRoute != null) {
@@ -120,7 +120,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         g2.setStroke(new BasicStroke(2));
 
         g.setColor(Color.BLUE);
-        g.drawOval((int)coordinates.get(0).gps2vue().getX() - 2 + xOffset, (int)coordinates.get(0).gps2vue().getY() - 2, 4, 4);
+
+        g.drawOval(coordinates.get(0).getGraphicsPoint().getCol() - 2 + xOffset, coordinates.get(0).getGraphicsPoint().getRow() - 2, 4, 4);
         //g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
 
         for (int i = 0; i < coordinates.size() - 1; i++) {
@@ -129,29 +130,22 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             else
                 g2.setColor(Color.RED);
 
-            g2.drawLine((int)coordinates.get(i).gps2vue().getX() + xOffset, (int)coordinates.get(i).gps2vue().getY(), (int)coordinates.get(i + 1).gps2vue().getX() + xOffset, (int)coordinates.get(i + 1).gps2vue().getY());
+            g2.drawLine(coordinates.get(i).getGraphicsPoint().getCol() + xOffset, coordinates.get(i).getGraphicsPoint().getRow(),
+                    coordinates.get(i + 1).getGraphicsPoint().getCol() + xOffset, coordinates.get(i + 1).getGraphicsPoint().getRow());
         }
 
         g.setColor(Color.BLUE);
-        g.drawOval((int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2 + xOffset, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2, 4, 4);
+        g.drawOval(coordinates.get(coordinates.size() - 1).getGraphicsPoint().getCol() - 2 + xOffset, coordinates.get(coordinates.size() - 1).getGraphicsPoint().getRow() - 2, 4, 4);
         //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
 
         if (mobileStartPointToDraw != null) {
             g.setColor(Color.GREEN);
-            Vecteur2D vecteur2D = new Vecteur2D(mobileStartPointToDraw.getLongitude(), mobileStartPointToDraw.getLatitude(),
-                    gpsDownLeft,
-                    gpsDownRight,
-                    gpsUpLeft);
-            g.fillOval((int)vecteur2D.gps2vue().getX() + xOffset, (int)vecteur2D.gps2vue().getY(), 10, 10);
+            g.fillOval(mobileStartPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileStartPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
         }
 
         if (mobileEndPointToDraw != null) {
             g.setColor(Color.RED);
-            Vecteur2D vecteur2D = new Vecteur2D(mobileEndPointToDraw.getLongitude(), mobileEndPointToDraw.getLatitude(),
-                    gpsDownLeft,
-                    gpsDownRight,
-                    gpsUpLeft);
-            g.fillOval((int)vecteur2D.gps2vue().getX() + xOffset, (int)vecteur2D.gps2vue().getY(), 10, 10);
+            g.fillOval(mobileEndPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileEndPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
         }
     }
 
@@ -184,37 +178,36 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         try {
             FileInputStream fileInputStream = new FileInputStream("data/gpsUpLeft.ser");
             ObjectInputStream in = new ObjectInputStream(fileInputStream);
-            gpsUpLeft = (Coordinate)in.readObject();
+            gpsUpLeft = (GPSPoint)in.readObject();
 
             fileInputStream = new FileInputStream("data/gpsDownLeft.ser");
             in = new ObjectInputStream(fileInputStream);
-            gpsDownLeft = (Coordinate)in.readObject();
+            gpsDownLeft = (GPSPoint)in.readObject();
 
             fileInputStream = new FileInputStream("data/gpsDownRight.ser");
             in = new ObjectInputStream(fileInputStream);
-            gpsDownRight = (Coordinate)in.readObject();
+            gpsDownRight = (GPSPoint) in.readObject();
 
             in.close();
             fileInputStream.close();
-        } catch (IOException | ClassNotFoundException e) {
-            if (e instanceof InvalidClassException) {
-                gpsUpLeft = new Coordinate(1.468209, 43.566174);
-                gpsDownLeft = new Coordinate(1.461643, 43.562777);
-                gpsDownRight = new Coordinate(1.468724, 43.555375);
-            }
+        } catch (IOException | ClassNotFoundException | ClassCastException e) {
+            gpsUpLeft = new GPSPoint(1.468209, 43.566174);
+            gpsDownLeft = new GPSPoint(1.461643, 43.562777);
+            gpsDownRight = new GPSPoint(1.468724, 43.555375);
             e.printStackTrace();
         }
+
     }
 
-    public Coordinate getGpsDownLeft() {
+    public GPSPoint getGpsDownLeft() {
         return gpsDownLeft;
     }
 
-    public Coordinate getGpsDownRight() {
+    public GPSPoint getGpsDownRight() {
         return gpsDownRight;
     }
 
-    public Coordinate getGpsUpLeft() {
+    public GPSPoint getGpsUpLeft() {
         return gpsUpLeft;
     }
 
@@ -266,14 +259,13 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return scaleWidth;
     }
 
-    class CalibrationWindow extends JFrame {
+    class CalibrationWindow extends JDialog {
 
         CalibrationWindow() {
             super();
             this.setTitle("Calibrage");
             this.setSize(240, 310);
             this.setResizable(false);
-            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
@@ -284,7 +276,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             JButton cancelButton = new JButton("Annuler");
             cancelButton.addActionListener(e -> {
                 loadGpsConfig();
-                System.out.println(gpsUpLeft.getY());
+                //System.out.println(gpsUpLeft.getLatitude());
             });
 
             JButton saveButton = new JButton("Sauvegarder");
@@ -320,14 +312,14 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             this.add(buttonsPanel);
         }
 
-        private JPanel createConfig(String title, Coordinate coordinate) {
+        private JPanel createConfig(String title, GPSPoint coordinate) {
             JPanel jPanel = new JPanel();
             jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
             jPanel.add(new JLabel(title));
 
-            JLabel longitudeLabel = new JLabel("Longitude : " + coordinate.getX());
+            JLabel longitudeLabel = new JLabel("Longitude : " + coordinate.getLongitude());
             longitudeLabel.setPreferredSize(new Dimension(120, 20));
-            JLabel latitudeLabel = new JLabel("Latitude : " + coordinate.getY());
+            JLabel latitudeLabel = new JLabel("Latitude : " + coordinate.getLatitude());
             latitudeLabel.setPreferredSize(new Dimension(120, 20));
 
             DecimalFormat df = new DecimalFormat("#.#####");
@@ -339,29 +331,29 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             JButton longitudeMinusButton = new JButton(minusIcon);
             longitudeMinusButton.setPreferredSize(new Dimension(20, 20));
             longitudeMinusButton.addActionListener(e -> {
-                coordinate.setX(coordinate.getX() - 0.00001);
-                longitudeLabel.setText("Longitude : " + df.format(coordinate.getX()));
+                coordinate.setLongitude(coordinate.getLongitude() - 0.00001);
+                longitudeLabel.setText("Longitude : " + df.format(coordinate.getLongitude()));
             });
 
             JButton longitudePlusButton = new JButton(plusIcon);
             longitudePlusButton.setPreferredSize(new Dimension(20, 20));
             longitudePlusButton.addActionListener(e -> {
-                coordinate.setX(coordinate.getX() + 0.00001);
-                longitudeLabel.setText("Longitude : " + df.format(coordinate.getX()));
+                coordinate.setLongitude(coordinate.getLongitude() + 0.00001);
+                longitudeLabel.setText("Longitude : " + df.format(coordinate.getLongitude()));
             });
 
             JButton latitudeMinusButton = new JButton(minusIcon);
             latitudeMinusButton.setPreferredSize(new Dimension(20, 20));
             latitudeMinusButton.addActionListener(e -> {
-                coordinate.setY(coordinate.getY() - 0.00001);
-                latitudeLabel.setText("Latitude : " + df.format(coordinate.getY()));
+                coordinate.setLatitude(coordinate.getLatitude() - 0.00001);
+                latitudeLabel.setText("Latitude : " + df.format(coordinate.getLatitude()));
             });
 
             JButton latitudePlusButton = new JButton(plusIcon);
             latitudePlusButton.setPreferredSize(new Dimension(20, 20));
             latitudePlusButton.addActionListener(e -> {
-                coordinate.setY(coordinate.getY() + 0.00001);
-                latitudeLabel.setText("Latitude : " + df.format(coordinate.getY()));
+                coordinate.setLatitude(coordinate.getLatitude() + 0.00001);
+                latitudeLabel.setText("Latitude : " + df.format(coordinate.getLatitude()));
             });
 
             JPanel subPanel = new JPanel();

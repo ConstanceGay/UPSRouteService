@@ -2,12 +2,10 @@ package Interface;
 
 import Application.Main;
 import UPSRouteService.Coordinate;
-import UPSRouteService.UPSRouteService;
 import UPSRouteService.GPSPoint;
 import Utilities.Scanner;
 import Utilities.TopCode;
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamResolution;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,20 +108,20 @@ public class UPSCameraPanel extends JPanel {
     }
 
     private GPSPoint getGpsFromCoordinateOnMap(GraphicsPoint coordinate) {
-        Coordinate gpsDownRight = Main.getMapWindow().getMapPanel().getGpsDownRight();
-        Coordinate gpsDownLeft = Main.getMapWindow().getMapPanel().getGpsDownLeft();
-        Coordinate gpsUpLeft = Main.getMapWindow().getMapPanel().getGpsUpLeft();
+        GPSPoint gpsDownRight = Main.getMapWindow().getMapPanel().getGpsDownRight();
+        GPSPoint gpsDownLeft = Main.getMapWindow().getMapPanel().getGpsDownLeft();
+        GPSPoint gpsUpLeft = Main.getMapWindow().getMapPanel().getGpsUpLeft();
 
-        Coordinate GPS_BG_BD = new Coordinate(gpsDownRight.getX() - gpsDownLeft.getX(), gpsDownRight.getY() - gpsDownLeft.getY());
-        Coordinate GPS_BG_HG = new Coordinate(gpsUpLeft.getX() - gpsDownLeft.getX(), gpsUpLeft.getY() - gpsDownLeft.getY());
+        GPSPoint GPS_BG_BD = new GPSPoint(gpsDownRight.getLongitude() - gpsDownLeft.getLongitude(), gpsDownRight.getLatitude() - gpsDownLeft.getLatitude());
+        GPSPoint GPS_BG_HG = new GPSPoint(gpsUpLeft.getLongitude() - gpsDownLeft.getLongitude(), gpsUpLeft.getLatitude() - gpsDownLeft.getLatitude());
 
         // calculer des proportions pour retrouver les tx et ty entre 0 et 1
         double tx = coordinate.getCol() / coordinateOrigin.getDistanceFrom(coordinateX);
         double ty = coordinate.getRow() / coordinateOrigin.getDistanceFrom(coordinateY);
 
         // appliquer tx et ty aux coordonnées GPS
-        return new GPSPoint(gpsDownLeft.getX() + tx * GPS_BG_BD.getX() + ty * GPS_BG_HG.getX(),
-                gpsDownLeft.getY() + tx * GPS_BG_BD.getY() + ty * GPS_BG_HG.getY());
+        return new GPSPoint(gpsDownLeft.getLongitude() + tx * GPS_BG_BD.getLongitude() + ty * GPS_BG_HG.getLongitude(),
+                gpsDownLeft.getLatitude() + tx * GPS_BG_BD.getLatitude() + ty * GPS_BG_HG.getLatitude());
     }
 
     public double getMapWidth() {
