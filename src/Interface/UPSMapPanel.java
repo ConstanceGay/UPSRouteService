@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.RoundingMode;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,8 +40,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         drawRoute(start, end);
 
         instructionWindow = new InstructionWindow(0,0,new Path());
-        CalibrationWindow calibrationWindow = new CalibrationWindow();
-        calibrationWindow.setVisible(true);
+        //CalibrationWindow calibrationWindow = new CalibrationWindow();
+        //calibrationWindow.setVisible(true);
 
         this.setBackground(Color.BLACK);
     }
@@ -95,9 +96,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         Graphics2D g2 = (Graphics2D) g;
 
         try {
-            BufferedImage image = ImageIO.read(new File("img/ups-map-9x6.png"));
-            double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
+            //BufferedImage image = ImageIO.read(new File("res/ups-map-9x6.png"));
+            BufferedImage image = ImageIO.read(getClass().getResource("/ups-map-9x6.png"));
 
+            double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
             scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
             int scaleHeight = (int) Math.round(image.getHeight() * scaleFactor);
 
@@ -176,20 +178,27 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     private void loadGpsConfig() {
         try {
-            FileInputStream fileInputStream = new FileInputStream("data/gpsUpLeft.ser");
-            ObjectInputStream in = new ObjectInputStream(fileInputStream);
+
+            //FileInputStream fileInputStream = new FileInputStream("res/gpsUpLeft.ser");
+            InputStream inputStream = getClass().getResourceAsStream("/gpsUpLeft.ser");
+
+            ObjectInputStream in = new ObjectInputStream(inputStream);
             gpsUpLeft = (GPSPoint)in.readObject();
 
-            fileInputStream = new FileInputStream("data/gpsDownLeft.ser");
-            in = new ObjectInputStream(fileInputStream);
+            //fileInputStream = new FileInputStream("res/gpsDownLeft.ser");
+            inputStream = getClass().getResourceAsStream("/gpsDownLeft.ser");
+
+            in = new ObjectInputStream(inputStream);
             gpsDownLeft = (GPSPoint)in.readObject();
 
-            fileInputStream = new FileInputStream("data/gpsDownRight.ser");
-            in = new ObjectInputStream(fileInputStream);
+            //fileInputStream = new FileInputStream("res/gpsDownRight.ser");
+            inputStream = getClass().getResourceAsStream("/gpsDownRight.ser");
+
+            in = new ObjectInputStream(inputStream);
             gpsDownRight = (GPSPoint) in.readObject();
 
             in.close();
-            fileInputStream.close();
+            inputStream.close();
         } catch (IOException | ClassNotFoundException | ClassCastException e) {
             gpsUpLeft = new GPSPoint(1.468209, 43.566174);
             gpsDownLeft = new GPSPoint(1.461643, 43.562777);
@@ -259,6 +268,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return scaleWidth;
     }
 
+    /*
     class CalibrationWindow extends JDialog {
 
         CalibrationWindow() {
@@ -282,15 +292,18 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             JButton saveButton = new JButton("Sauvegarder");
             saveButton.addActionListener(e -> {
                 try {
-                    FileOutputStream fileOutputStream = new FileOutputStream("data/gpsUpLeft.ser");
+                    FileOutputStream fileOutputStream = new FileOutputStream("res/gpsUpLeft.ser");
+
                     ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
                     out.writeObject(gpsUpLeft);
 
-                    fileOutputStream = new FileOutputStream("data/gpsDownLeft.ser");
+                    fileOutputStream = new FileOutputStream("res/gpsDownLeft.ser");
+
                     out = new ObjectOutputStream(fileOutputStream);
                     out.writeObject(gpsDownLeft);
 
-                    fileOutputStream = new FileOutputStream("data/gpsDownRight.ser");
+                    fileOutputStream = new FileOutputStream("res/gpsDownRight.ser");
+
                     out = new ObjectOutputStream(fileOutputStream);
                     out.writeObject(gpsDownRight);
 
@@ -325,8 +338,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             DecimalFormat df = new DecimalFormat("#.#####");
             df.setRoundingMode(RoundingMode.HALF_UP);
 
-            ImageIcon plusIcon = new ImageIcon("img/plus-btn.png");
-            ImageIcon minusIcon = new ImageIcon("img/minus-btn.png");
+            //ImageIcon plusIcon = new ImageIcon("/plus-btn.png");
+            //ImageIcon minusIcon = new ImageIcon("/minus-btn.png");
+            ImageIcon plusIcon = new ImageIcon(getClass().getResource("/plus-btn.png"));
+            ImageIcon minusIcon = new ImageIcon(getClass().getResource("/minus-btn.png"));
 
             JButton longitudeMinusButton = new JButton(minusIcon);
             longitudeMinusButton.setPreferredSize(new Dimension(20, 20));
@@ -371,6 +386,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         }
 
     }
+
+
+     */
 
     //Methods that have to be implemented with this interface
     public void mousePressed(MouseEvent e) {}

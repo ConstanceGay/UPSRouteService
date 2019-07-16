@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="RouteServiceUPS:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/RouteServiceUPS_jar</output-path>
+    <root id="archive" name="RouteServiceUPS.jar">
+      <element id="module-output" name="RouteServiceUPS" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libraries/slf4j-jdk14-1.7.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libraries/bridj-0.7.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libraries/webcam-capture-0.3.10.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libraries/java-json.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libraries/slf4j-api-1.7.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
