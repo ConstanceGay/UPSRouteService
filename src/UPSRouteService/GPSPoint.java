@@ -37,27 +37,7 @@ public class GPSPoint implements Serializable {
         double ty = det * ((B * gpsDownLeftToDownRight.getLongitude() + D * gpsDownLeftToUpLeft.getLongitude()) * W.longitude
                 + (B * gpsDownLeftToDownRight.getLatitude() + D * gpsDownLeftToUpLeft.getLatitude()) * W.latitude);
 
-        return new GraphicsPoint((int)(tx * Main.getMapWindow().getMapPanel().getScaleWidth()), (int)((1-ty) * Main.getMapWindow().getHeight()));
-
-         /*double tx = (gpsDownLeftToDownRight.longitude * (longitude - gpsDownLeft.longitude)
-                + gpsDownLeftToDownRight.latitude * (latitude - gpsDownLeft.latitude))
-                / gpsDownLeftToDownRight.getSquaredSum();
-
-        double ty = (gpsDownLeftToUpLeft.longitude * (longitude - gpsDownLeft.longitude)
-                + gpsDownLeftToUpLeft.latitude * (latitude - gpsDownLeft.latitude))
-                / gpsDownLeftToUpLeft.getSquaredSum();
-
-        System.out.print("[tx: " + tx + ", ty: " + ty + "] -> ");
-
-        //GraphicsPoint graphicsPoint = new GraphicsPoint((int)(gpsDownLeft.longitude + tx * gpsDownLeftToDownRight.longitude),
-                //(int)(gpsDownLeft.latitude + ty * gpsDownLeftToUpLeft.latitude));
-
-        GraphicsPoint graphicsPoint = new GraphicsPoint((int)(tx * Main.getMapWindow().getMapPanel().getScaleWidth()),
-                (int)(ty * Main.getMapWindow().getMapPanel().getHeight()));
-
-        System.out.println(graphicsPoint);
-
-        return graphicsPoint;*/
+        return new GraphicsPoint((int)(tx * Main.getMapWindow().getMapPanel().getScaleWidth()), (int)((1-ty) * Main.getMapWindow().getMapPanel().getHeight()));
     }
 
     public double getLatitude() {

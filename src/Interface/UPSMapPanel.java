@@ -40,8 +40,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         drawRoute(start, end);
 
         instructionWindow = new InstructionWindow(0,0,new Path());
-        //CalibrationWindow calibrationWindow = new CalibrationWindow();
-        //calibrationWindow.setVisible(true);
+        CalibrationWindow calibrationWindow = new CalibrationWindow();
+        calibrationWindow.setVisible(true);
 
         this.setBackground(Color.BLACK);
     }
@@ -268,7 +268,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return scaleWidth;
     }
 
-    /*
     class CalibrationWindow extends JDialog {
 
         CalibrationWindow() {
@@ -386,9 +385,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         }
 
     }
-
-
-     */
 
     //Methods that have to be implemented with this interface
     public void mousePressed(MouseEvent e) {}
