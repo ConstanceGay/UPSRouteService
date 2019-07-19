@@ -69,7 +69,6 @@ public class InstructionWindow extends JFrame{
         jList.setModel(listSelectionModel);
         JScrollPane jScrollPane = new JScrollPane(jList);
         this.add(jScrollPane);
-        this.setVisible(true);
     }
 
     public void refresh(int distance, int duration, Path steps, String startBuilding, String endBuilding) {

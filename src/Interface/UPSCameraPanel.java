@@ -39,6 +39,12 @@ public class UPSCameraPanel extends JPanel {
         new Timer(delay, taskPerformer).start();
     }
 
+    public void stopCamera(){
+        if (webcam.isOpen()){
+            webcam.close();
+        }
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         BufferedImage image = webcam.getImage();
@@ -72,7 +78,7 @@ public class UPSCameraPanel extends JPanel {
 
                     g.drawString(topCodeOnMap + " -> " + gpsPoint, topCodePosition.getCol() - 20, topCodePosition.getRow() - 10);
 
-                    //System.out.println(upsRouteService.getBuilding(coordinate.getX(), coordinate.getY()));
+                    System.out.println("GPS Départ : "+gpsPoint.toString());
                     Main.getMapWindow().getMapPanel().setMobileStartPointToDraw(gpsPoint);
                     break;
                 case 55:
@@ -82,6 +88,7 @@ public class UPSCameraPanel extends JPanel {
 
                     g.drawString(topCodeOnMap2 + " -> " + gpsPoint2, topCodePosition2.getCol() - 20, topCodePosition2.getRow() - 10);
 
+                    System.out.println("GPS Arrivée : "+gpsPoint2.toString());
                     Main.getMapWindow().getMapPanel().setMobileEndPointToDraw(gpsPoint2);
                     break;
             }

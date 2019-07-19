@@ -37,12 +37,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
         loadGpsConfig();
-        drawRoute(start, end);
-
         instructionWindow = new InstructionWindow(0,0,new Path());
-        CalibrationWindow calibrationWindow = new CalibrationWindow();
-        calibrationWindow.setVisible(true);
-
+        drawRoute(start, end);
         this.setBackground(Color.BLACK);
     }
 
@@ -61,6 +57,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     }
 
     void drawRoute(Location start, Location end) {
+        instructionWindow.setVisible(false);
         mobileStartPointToDraw = null;
         mobileEndPointToDraw = null;
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
@@ -197,6 +194,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             in = new ObjectInputStream(inputStream);
             gpsDownRight = (GPSPoint) in.readObject();
 
+            System.out.println("GPS bas gauche : "+gpsDownLeft.toString());
+            System.out.println("GPS haut gauche : "+gpsUpLeft.toString());
+            System.out.println("GPS bas droit : "+gpsDownRight.toString());
+
             in.close();
             inputStream.close();
         } catch (IOException | ClassNotFoundException | ClassCastException e) {
@@ -266,124 +267,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     public int getScaleWidth() {
         return scaleWidth;
-    }
-
-    class CalibrationWindow extends JDialog {
-
-        CalibrationWindow() {
-            super();
-            this.setTitle("Calibrage");
-            this.setSize(240, 310);
-            this.setResizable(false);
-
-            this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
-
-            this.add(createConfig("Haut Gauche", gpsUpLeft));
-            this.add(createConfig("Bas Gauche", gpsDownLeft));
-            this.add(createConfig("Bas Droit", gpsDownRight));
-
-            JButton cancelButton = new JButton("Annuler");
-            cancelButton.addActionListener(e -> {
-                loadGpsConfig();
-                //System.out.println(gpsUpLeft.getLatitude());
-            });
-
-            JButton saveButton = new JButton("Sauvegarder");
-            saveButton.addActionListener(e -> {
-                try {
-                    FileOutputStream fileOutputStream = new FileOutputStream("res/gpsUpLeft.ser");
-
-                    ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
-                    out.writeObject(gpsUpLeft);
-
-                    fileOutputStream = new FileOutputStream("res/gpsDownLeft.ser");
-
-                    out = new ObjectOutputStream(fileOutputStream);
-                    out.writeObject(gpsDownLeft);
-
-                    fileOutputStream = new FileOutputStream("res/gpsDownRight.ser");
-
-                    out = new ObjectOutputStream(fileOutputStream);
-                    out.writeObject(gpsDownRight);
-
-                    fileOutputStream.close();
-                    out.close();
-
-                    JOptionPane.showMessageDialog(this,
-                            "Les paramètres de calibration ont bien étaient sauvegardés.",
-                            "Information",
-                            JOptionPane.PLAIN_MESSAGE);
-                } catch(IOException i) {
-                    i.printStackTrace();
-                }
-            });
-
-            JPanel buttonsPanel = new JPanel();
-            //buttonsPanel.add(cancelButton); TODO : réparer ce bouton qui ne fonctionne pas
-            buttonsPanel.add(saveButton);
-            this.add(buttonsPanel);
-        }
-
-        private JPanel createConfig(String title, GPSPoint coordinate) {
-            JPanel jPanel = new JPanel();
-            jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
-            jPanel.add(new JLabel(title));
-
-            JLabel longitudeLabel = new JLabel("Longitude : " + coordinate.getLongitude());
-            longitudeLabel.setPreferredSize(new Dimension(120, 20));
-            JLabel latitudeLabel = new JLabel("Latitude : " + coordinate.getLatitude());
-            latitudeLabel.setPreferredSize(new Dimension(120, 20));
-
-            DecimalFormat df = new DecimalFormat("#.#####");
-            df.setRoundingMode(RoundingMode.HALF_UP);
-
-            //ImageIcon plusIcon = new ImageIcon("/plus-btn.png");
-            //ImageIcon minusIcon = new ImageIcon("/minus-btn.png");
-            ImageIcon plusIcon = new ImageIcon(getClass().getResource("/plus-btn.png"));
-            ImageIcon minusIcon = new ImageIcon(getClass().getResource("/minus-btn.png"));
-
-            JButton longitudeMinusButton = new JButton(minusIcon);
-            longitudeMinusButton.setPreferredSize(new Dimension(20, 20));
-            longitudeMinusButton.addActionListener(e -> {
-                coordinate.setLongitude(coordinate.getLongitude() - 0.00001);
-                longitudeLabel.setText("Longitude : " + df.format(coordinate.getLongitude()));
-            });
-
-            JButton longitudePlusButton = new JButton(plusIcon);
-            longitudePlusButton.setPreferredSize(new Dimension(20, 20));
-            longitudePlusButton.addActionListener(e -> {
-                coordinate.setLongitude(coordinate.getLongitude() + 0.00001);
-                longitudeLabel.setText("Longitude : " + df.format(coordinate.getLongitude()));
-            });
-
-            JButton latitudeMinusButton = new JButton(minusIcon);
-            latitudeMinusButton.setPreferredSize(new Dimension(20, 20));
-            latitudeMinusButton.addActionListener(e -> {
-                coordinate.setLatitude(coordinate.getLatitude() - 0.00001);
-                latitudeLabel.setText("Latitude : " + df.format(coordinate.getLatitude()));
-            });
-
-            JButton latitudePlusButton = new JButton(plusIcon);
-            latitudePlusButton.setPreferredSize(new Dimension(20, 20));
-            latitudePlusButton.addActionListener(e -> {
-                coordinate.setLatitude(coordinate.getLatitude() + 0.00001);
-                latitudeLabel.setText("Latitude : " + df.format(coordinate.getLatitude()));
-            });
-
-            JPanel subPanel = new JPanel();
-            subPanel.add(longitudeLabel);
-            subPanel.add(longitudeMinusButton);
-            subPanel.add(longitudePlusButton);
-            jPanel.add(subPanel);
-
-            subPanel.add(latitudeLabel);
-            subPanel.add(latitudeMinusButton);
-            subPanel.add(latitudePlusButton);
-            jPanel.add(subPanel);
-
-            return jPanel;
-        }
-
     }
 
     //Methods that have to be implemented with this interface

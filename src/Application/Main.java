@@ -1,7 +1,6 @@
 package Application;
 
-import Interface.CameraWindow;
-import Interface.MapWindow;
+import Interface.*;
 import UPSRouteService.Location;
 import UPSRouteService.UPSRouteService;
 import Utilities.Scanner;
@@ -17,24 +16,20 @@ import java.util.List;
 public class Main {
 
     private static MapWindow mapWindow;
-    private static CameraWindow cameraWindow;
+    private static ModeWindow modeWindow;
+
 
     public static void main(String[] args) {
-        new Thread(() -> {
-            mapWindow = new MapWindow();
-            mapWindow.open();
-        }).start();
+        mapWindow = new MapWindow();
+        mapWindow.open();
 
-        cameraWindow = new CameraWindow();
-        cameraWindow.runCamera();
+        modeWindow  = new ModeWindow();
+        modeWindow.setVisible(true);
+
     }
 
     public static MapWindow getMapWindow() {
         return mapWindow;
-    }
-
-    public static CameraWindow getCameraWindow() {
-        return cameraWindow;
     }
 
 }
