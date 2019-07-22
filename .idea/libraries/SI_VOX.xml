@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SI_VOX">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libraries/SI_VOX.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

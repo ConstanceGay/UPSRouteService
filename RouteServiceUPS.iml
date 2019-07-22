@@ -15,5 +15,6 @@
     <orderEntry type="library" name="bridj-0.7.0" level="project" />
     <orderEntry type="library" name="jogl-all" level="project" />
     <orderEntry type="library" name="LWJGL" level="project" />
+    <orderEntry type="library" name="SI_VOX" level="project" />
   </component>
 </module>

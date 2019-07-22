@@ -4,9 +4,11 @@ import UPSRouteService.Instruction;
 import UPSRouteService.Location;
 import UPSRouteService.Path;
 import UPSRouteService.Profile;
+import t2s.son.LecteurTexte;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
 import java.util.List;
 
 public class NavigationWindow extends JFrame {
@@ -90,7 +92,22 @@ public class NavigationWindow extends JFrame {
 
         Path steps = upsMapPanel.getSteps();
         listSelectionModel.removeAllElements();
+
         steps.forEach(i -> listSelectionModel.addElement(i));
+        final LecteurTexte lecteur = new LecteurTexte();
+        lecteur.setTexte("Bonjour je suis l'ordinateur qui parle");
+        lecteur.playAll();
+        /*
+        final LecteurTexte lecteur = new LecteurTexte();
+        for (int ite=0;ite<listSelectionModel.getSize()-1;ite++){
+            Instruction etape = listSelectionModel.getElementAt(ite);
+            System.out.println(etape.toString());
+            lecteur.setTexte("Prendre la direction nord");
+            lecteur.playAll();
+        }
+
+         */
+
 
         jList = new JList<>();
         jList.setModel(listSelectionModel);
@@ -124,6 +141,15 @@ public class NavigationWindow extends JFrame {
         listSelectionModel.removeAllElements();
         steps.forEach(i -> listSelectionModel.addElement(i));
         jList.setModel(listSelectionModel);
+
+        //Instruction reader
+        final LecteurTexte lecteur = new LecteurTexte();
+        for (int ite=0;ite<listSelectionModel.getSize();ite++){
+            Instruction etape = listSelectionModel.getElementAt(ite);
+            System.out.println(etape.toString());
+            lecteur.setTexte(etape.toString());
+            lecteur.playAll();
+        }
     }
 
 }

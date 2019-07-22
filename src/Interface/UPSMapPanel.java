@@ -2,6 +2,7 @@ package Interface;
 
 import UPSRouteService.*;
 
+import t2s.son.LecteurTexte;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -49,6 +50,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY(),gpsDownLeft,gpsDownRight,gpsUpLeft);
         Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
         building = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
+
+        //Reads building name out loud
+        final LecteurTexte lecteur = new LecteurTexte();
+        lecteur.setTexte(building);
+        lecteur.playAll();
         repaint();
     }
 
