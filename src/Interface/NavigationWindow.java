@@ -33,6 +33,8 @@ public class NavigationWindow extends JFrame {
         JPanel navigationPanel = new JPanel();
         navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.PAGE_AXIS));
 
+        this.setLocation(0,240);
+
         JPanel profilePanel = new JPanel();
         JPanel startPanel = new JPanel();
         JPanel endPanel = new JPanel();
@@ -94,20 +96,6 @@ public class NavigationWindow extends JFrame {
         listSelectionModel.removeAllElements();
 
         steps.forEach(i -> listSelectionModel.addElement(i));
-        final LecteurTexte lecteur = new LecteurTexte();
-        lecteur.setTexte("Bonjour je suis l'ordinateur qui parle");
-        lecteur.playAll();
-        /*
-        final LecteurTexte lecteur = new LecteurTexte();
-        for (int ite=0;ite<listSelectionModel.getSize()-1;ite++){
-            Instruction etape = listSelectionModel.getElementAt(ite);
-            System.out.println(etape.toString());
-            lecteur.setTexte("Prendre la direction nord");
-            lecteur.playAll();
-        }
-
-         */
-
 
         jList = new JList<>();
         jList.setModel(listSelectionModel);
@@ -142,14 +130,8 @@ public class NavigationWindow extends JFrame {
         steps.forEach(i -> listSelectionModel.addElement(i));
         jList.setModel(listSelectionModel);
 
-        //Instruction reader
-        final LecteurTexte lecteur = new LecteurTexte();
-        for (int ite=0;ite<listSelectionModel.getSize();ite++){
-            Instruction etape = listSelectionModel.getElementAt(ite);
-            System.out.println(etape.toString());
-            lecteur.setTexte(etape.toString());
-            lecteur.playAll();
-        }
+        TextToVoice voice = new TextToVoice(listSelectionModel);
+        voice.start();
     }
 
 }

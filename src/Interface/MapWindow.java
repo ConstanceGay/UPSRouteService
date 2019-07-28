@@ -22,6 +22,12 @@ public class MapWindow extends JFrame {
         this.setSize(940, 655);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice defaultScreen = ge.getDefaultScreenDevice();
+        Rectangle rect = defaultScreen.getDefaultConfiguration().getBounds();
+        int x = (int) rect.getMaxX() - this.getWidth();
+        int y = (int) rect.getMaxY() - this.getHeight();
+        this.setLocation(x,y);
 
         MapWindow frame = this;
         this.addKeyListener(new KeyListener() {
@@ -58,7 +64,6 @@ public class MapWindow extends JFrame {
         upsMapPanel = new UPSMapPanel(Location.BATIMENT_U3, Location.IRIT);
         upsMapPanel.setFocusable(true);
         this.add(upsMapPanel);
-
         this.setVisible(true);
     }
 

@@ -15,6 +15,7 @@ public class Instruction {
         put(10, "Votre destination est sur la gauche");
         put(11, "Prendre la direction nord-est");
     }};
+
     private static Map<Integer, String> instructionTypeMap = new HashMap<>() {{
         put(0, "Tournez à gauche en direction de ");
         put(1, "Tournez à droite sur ");

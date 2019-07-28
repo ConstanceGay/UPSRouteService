@@ -2,7 +2,6 @@ package Interface;
 
 import UPSRouteService.*;
 
-import t2s.son.LecteurTexte;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -10,30 +9,38 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.math.RoundingMode;
-import java.net.URISyntaxException;
-import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 public class UPSMapPanel extends JPanel implements MouseListener{
 
-    private List<GPSPoint> coordinates;
+    private String imagePath = "/ups-map-9x6.png";
+    private List<GPSPoint> coordinates;                                     //all the points of the path
     private UPSRouteService upsRouteService = new UPSRouteService();
-    private GPSPoint mobileStartPointToDraw;
-    private GPSPoint mobileEndPointToDraw;
-    private List<Integer> wayPointsToDraw = new LinkedList<>();
-    private Path steps;
+
+    private GPSPoint mobileStartPointToDraw;                                //Start of the path point
+    private GPSPoint mobileEndPointToDraw;                                  //End of path point
+    private GPSPoint explorationPoint;                                      //Exploration point
+
+    private List<Integer> wayPointsToDraw = new LinkedList<>();             //points of the path selected by user
+    private Path steps;                                                     //Navigation instructions
+
+    //GPS coordinates of the corners of the map
     private GPSPoint gpsDownLeft;
     private GPSPoint gpsDownRight;
     private GPSPoint gpsUpLeft;
-    private Coordinate mouseCoordinate = new Coordinate(0,0);
-    private String building = "";
+
+    private Coordinate mouseCoordinate = new Coordinate(0,0);         //position of the mouse on the map
+    private String mouseBuilding = "";                                      //building selected by the mouse click
+    private String explorationBuilding = "";                                //building selected by topcode
+
+    private InstructionWindow instructionWindow;                            //Window to display route information
     private int distance;
     private int duration;
-    private InstructionWindow instructionWindow;
+
     private int scaleWidth;
     private int xOffset;
+
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
@@ -49,12 +56,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         mouseCoordinate.setY(evt.getPoint().y);
         Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY(),gpsDownLeft,gpsDownRight,gpsUpLeft);
         Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
-        building = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
+        mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
 
         //Reads building name out loud
-        final LecteurTexte lecteur = new LecteurTexte();
-        lecteur.setTexte(building);
-        lecteur.playAll();
+        TextToVoice voice = new TextToVoice(mouseBuilding);
+        voice.start();
         repaint();
     }
 
@@ -62,6 +68,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         upsRouteService.setProfile(profile);
     }
 
+    //Draws the route for a path selected with the application
     void drawRoute(Location start, Location end) {
         instructionWindow.setVisible(false);
         mobileStartPointToDraw = null;
@@ -81,6 +88,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     JOptionPane.ERROR_MESSAGE);
     }
 
+    //Draws the route for a path selected using the camera and topcodes
     private void drawRoute(GPSPoint start, GPSPoint end) {
         UPSRoute upsRoute = upsRouteService.getRoute(start, end);
 
@@ -99,8 +107,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         Graphics2D g2 = (Graphics2D) g;
 
         try {
-            //BufferedImage image = ImageIO.read(new File("res/ups-map-9x6.png"));
-            BufferedImage image = ImageIO.read(getClass().getResource("/ups-map-9x6.png"));
+            BufferedImage image = ImageIO.read(getClass().getResource(imagePath));
 
             double scaleFactor = Math.min(1d, getScaleFactorToFit(new Dimension(image.getWidth(), image.getHeight()), getSize()));
             scaleWidth = (int) Math.round(image.getWidth() * scaleFactor);
@@ -119,18 +126,18 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             e.printStackTrace();
         }
 
-        if (building != null) {
-            g.drawString(building, (int) mouseCoordinate.getX(), (int) mouseCoordinate.getY());
+        if (mouseBuilding != null) {
+            g.drawString(mouseBuilding, (int) mouseCoordinate.getX(), (int) mouseCoordinate.getY());
         }
+
+        //Draws the first point of the path in BLUE
         g2.setStroke(new BasicStroke(2));
-
         g.setColor(Color.BLUE);
-
         g.drawOval(coordinates.get(0).getGraphicsPoint().getCol() - 2 + xOffset, coordinates.get(0).getGraphicsPoint().getRow() - 2, 4, 4);
-        //g.drawString(start.toString(), (int)coordinates.get(0).gps2vue().getX() - 2, (int)coordinates.get(0).gps2vue().getY() - 2);
 
         for (int i = 0; i < coordinates.size() - 1; i++) {
             if (wayPointsToDraw.contains(i))
+                //if this part of the path is selected it'll be in orange
                 g2.setColor(Color.ORANGE);
             else
                 g2.setColor(Color.RED);
@@ -139,46 +146,33 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     coordinates.get(i + 1).getGraphicsPoint().getCol() + xOffset, coordinates.get(i + 1).getGraphicsPoint().getRow());
         }
 
+        //draws the end point of the path in BLUE
         g.setColor(Color.BLUE);
         g.drawOval(coordinates.get(coordinates.size() - 1).getGraphicsPoint().getCol() - 2 + xOffset, coordinates.get(coordinates.size() - 1).getGraphicsPoint().getRow() - 2, 4, 4);
-        //g.drawString(end.toString(), (int)coordinates.get(coordinates.size() - 1).gps2vue().getX() - 2, (int)coordinates.get(coordinates.size() - 1).gps2vue().getY() - 2);
 
+        //draws the topcode starting point in GREEN
         if (mobileStartPointToDraw != null) {
             g.setColor(Color.GREEN);
             g.fillOval(mobileStartPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileStartPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
         }
 
+        //draws the exploration point in YELLOW
+        if (explorationPoint != null){
+            g.setColor(Color.YELLOW);
+            g.fillOval(explorationPoint.getGraphicsPoint().getCol() + xOffset - 5, explorationPoint.getGraphicsPoint().getRow() - 5, 10, 10);
+            if (explorationBuilding != null){
+                g.drawString(explorationBuilding, explorationPoint.getGraphicsPoint().getCol() + xOffset - 5, explorationPoint.getGraphicsPoint().getRow() - 5);
+            }
+        }
+
+        //Draws the topcode endpoint in red
         if (mobileEndPointToDraw != null) {
             g.setColor(Color.RED);
             g.fillOval(mobileEndPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileEndPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
         }
     }
 
-    private double getScaleFactorToFit(Dimension original, Dimension toFit) {
-        double dScale = 1d;
-
-        if (original != null && toFit != null) {
-
-            double dScaleWidth = getScaleFactor(original.width, toFit.width);
-            double dScaleHeight = getScaleFactor(original.height, toFit.height);
-
-            dScale = Math.min(dScaleHeight, dScaleWidth);
-        }
-
-        return dScale;
-    }
-
-    private double getScaleFactor(int iMasterSize, int iTargetSize) {
-        double dScale;
-        if (iMasterSize > iTargetSize) {
-            dScale = (double)iTargetSize / (double)iMasterSize;
-        } else {
-            dScale = (double)iTargetSize / (double)iMasterSize;
-        }
-
-        return dScale;
-    }
-
+    //Gets the GPS configuration from the files
     private void loadGpsConfig() {
         try {
 
@@ -215,26 +209,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     }
 
-    public GPSPoint getGpsDownLeft() {
-        return gpsDownLeft;
-    }
-
-    public GPSPoint getGpsDownRight() {
-        return gpsDownRight;
-    }
-
-    public GPSPoint getGpsUpLeft() {
-        return gpsUpLeft;
-    }
-
-    Path getSteps() {
-        return steps;
-    }
-
-    int getDuration() { return duration; }
-
-    int getDistance(){ return distance;}
-
     void setMobileStartPointToDraw(GPSPoint gpsPoint) {
         if(mobileStartPointToDraw != null) {
             Boolean isDif = (gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude());
@@ -263,6 +237,22 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         }
     }
 
+    //Draws the exploration point on the map and gets the name of the building
+    void setExplorationPoint (GPSPoint gpsPoint){
+        explorationPoint = gpsPoint;
+        String new_building = upsRouteService.getBuilding(explorationPoint.getGraphicsPoint().getCol(),explorationPoint.getGraphicsPoint().getRow());
+        if (!explorationBuilding.equals(new_building)){
+            System.out.println(explorationBuilding);
+            //Reads building name out loud
+            TextToVoice voice = new TextToVoice(explorationBuilding);
+            voice.start();
+            }
+    }
+
+    void setImage(String imagePath){
+        this.imagePath = imagePath;
+    }
+
     void addAllWayPointsToDraw(List<Integer> points) {
         wayPointsToDraw.addAll(points);
     }
@@ -271,14 +261,57 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         wayPointsToDraw.clear();
     }
 
-    public int getScaleWidth() {
-        return scaleWidth;
-    }
-
     //Methods that have to be implemented with this interface
     public void mousePressed(MouseEvent e) {}
     public void mouseReleased(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
+
+    public GPSPoint getGpsDownLeft() {
+        return gpsDownLeft;
+    }
+
+    public GPSPoint getGpsDownRight() {
+        return gpsDownRight;
+    }
+
+    public GPSPoint getGpsUpLeft() { return gpsUpLeft; }
+
+    Path getSteps() {
+        return steps;
+    }
+
+    int getDuration() { return duration; }
+
+    int getDistance(){ return distance;}
+
+    private double getScaleFactorToFit(Dimension original, Dimension toFit) {
+        double dScale = 1d;
+
+        if (original != null && toFit != null) {
+
+            double dScaleWidth = getScaleFactor(original.width, toFit.width);
+            double dScaleHeight = getScaleFactor(original.height, toFit.height);
+
+            dScale = Math.min(dScaleHeight, dScaleWidth);
+        }
+
+        return dScale;
+    }
+
+    private double getScaleFactor(int iMasterSize, int iTargetSize) {
+        double dScale;
+        if (iMasterSize > iTargetSize) {
+            dScale = (double)iTargetSize / (double)iMasterSize;
+        } else {
+            dScale = (double)iTargetSize / (double)iMasterSize;
+        }
+
+        return dScale;
+    }
+
+    public int getScaleWidth() {
+        return scaleWidth;
+    }
 }
 

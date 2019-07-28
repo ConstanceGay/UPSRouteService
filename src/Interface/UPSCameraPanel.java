@@ -19,6 +19,7 @@ public class UPSCameraPanel extends JPanel {
     private GraphicsPoint coordinateX = new GraphicsPoint();
     private GraphicsPoint coordinateY = new GraphicsPoint();
     private GraphicsPoint coordinateOrigin = new GraphicsPoint();
+    private GraphicsPoint explorationPoint= new GraphicsPoint();
     private double mapWidth;
     private double mapHeight;
 
@@ -81,6 +82,7 @@ public class UPSCameraPanel extends JPanel {
                     System.out.println("GPS Départ : "+gpsPoint.toString());
                     Main.getMapWindow().getMapPanel().setMobileStartPointToDraw(gpsPoint);
                     break;
+
                 case 55:
                     GraphicsPoint topCodePosition2 = new GraphicsPoint((int)t.getCenterX(), (int)t.getCenterY());
                     GraphicsPoint topCodeOnMap2 = getCoordinateOnMap(t);
@@ -91,6 +93,20 @@ public class UPSCameraPanel extends JPanel {
                     System.out.println("GPS Arrivée : "+gpsPoint2.toString());
                     Main.getMapWindow().getMapPanel().setMobileEndPointToDraw(gpsPoint2);
                     break;
+
+                case 75:        //A CHERCHER
+                    GraphicsPoint topCodePosition3 = new GraphicsPoint((int) t.getCenterX(), (int) t.getCenterY());
+                    if (explorationPoint.getDistanceFrom(topCodePosition3) >= 10) {             //if the exploration point moved enough, it is updated
+                        explorationPoint = topCodePosition3;
+                        GraphicsPoint topCodeOnMap3 = getCoordinateOnMap(t);
+                        GPSPoint gpsPoint3 = getGpsFromCoordinateOnMap(topCodeOnMap3);
+
+                        g.drawString(topCodeOnMap3 + " -> " + gpsPoint3, topCodePosition3.getCol() - 20, topCodePosition3.getRow() - 10);
+
+                        Main.getMapWindow().getMapPanel().setExplorationPoint(gpsPoint3);
+                    }
+                    break;
+
             }
             g.drawOval((int)t.getCenterX() - 5, (int)t.getCenterY() - 5, 10, 10);
         });

@@ -38,11 +38,14 @@ public class ModeWindow extends JFrame {
         JRadioButton navigationButton   = new JRadioButton("Navigation");
         JRadioButton calibrationButton    = new JRadioButton("Calibration");
         JRadioButton cameraButton    = new JRadioButton("Camera");
+        JToggleButton imageButton = new JToggleButton("Image");
 
+        /*
         ButtonGroup bgroup = new ButtonGroup();
         bgroup.add(navigationButton);
         bgroup.add(calibrationButton);
         bgroup.add(cameraButton);
+        bgroup.add(imageButton); */
 
         calibrationButton.addActionListener(new ActionListener() {
             @Override
@@ -74,16 +77,27 @@ public class ModeWindow extends JFrame {
             }
         });
 
+        imageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = imageButton.getModel().isSelected();
+                if (!selected){
+                    Main.getMapWindow().getMapPanel().setImage("/ups-map-9x6.png");
+                } else{
+                    Main.getMapWindow().getMapPanel().setImage("/black_map.png");
+                }
+            }
+        });
+
+
         JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new GridLayout(3, 1));
+        radioPanel.setLayout(new GridLayout(4, 1));
         radioPanel.add(navigationButton);
         radioPanel.add(calibrationButton);
         radioPanel.add(cameraButton);
+        radioPanel.add(imageButton);
 
-        radioPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Quel mode souhaitez-vous?"));
-
-
+        radioPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Quel mode souhaitez-vous?"));
         setContentPane(radioPanel);  // Button panel is only content.
         pack();
     }
