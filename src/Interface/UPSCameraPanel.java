@@ -79,7 +79,7 @@ public class UPSCameraPanel extends JPanel {
 
                     g.drawString(topCodeOnMap + " -> " + gpsPoint, topCodePosition.getCol() - 20, topCodePosition.getRow() - 10);
 
-                    System.out.println("GPS Départ : "+gpsPoint.toString());
+                    //System.out.println("GPS Départ : "+gpsPoint.toString());
                     Main.getMapWindow().getMapPanel().setMobileStartPointToDraw(gpsPoint);
                     break;
 
@@ -90,21 +90,22 @@ public class UPSCameraPanel extends JPanel {
 
                     g.drawString(topCodeOnMap2 + " -> " + gpsPoint2, topCodePosition2.getCol() - 20, topCodePosition2.getRow() - 10);
 
-                    System.out.println("GPS Arrivée : "+gpsPoint2.toString());
+                    //System.out.println("GPS Arrivée : "+gpsPoint2.toString());
                     Main.getMapWindow().getMapPanel().setMobileEndPointToDraw(gpsPoint2);
                     break;
 
-                case 75:        //A CHERCHER
+                case 59:
                     GraphicsPoint topCodePosition3 = new GraphicsPoint((int) t.getCenterX(), (int) t.getCenterY());
-                    if (explorationPoint.getDistanceFrom(topCodePosition3) >= 10) {             //if the exploration point moved enough, it is updated
-                        explorationPoint = topCodePosition3;
-                        GraphicsPoint topCodeOnMap3 = getCoordinateOnMap(t);
-                        GPSPoint gpsPoint3 = getGpsFromCoordinateOnMap(topCodeOnMap3);
+                    GraphicsPoint topCodeOnMap3 = getCoordinateOnMap(t);
+                    GPSPoint gpsPoint3 = getGpsFromCoordinateOnMap(topCodeOnMap3);
 
-                        g.drawString(topCodeOnMap3 + " -> " + gpsPoint3, topCodePosition3.getCol() - 20, topCodePosition3.getRow() - 10);
+                    g.drawString(topCodeOnMap3 + " -> " + gpsPoint3, topCodePosition3.getCol() - 20, topCodePosition3.getRow() - 10);
 
+                    if (explorationPoint.getDistanceFrom(topCodeOnMap3) >= 13) {             //if the exploration point moved 1 cm, it is updated
+                        explorationPoint = topCodeOnMap3;
                         Main.getMapWindow().getMapPanel().setExplorationPoint(gpsPoint3);
                     }
+
                     break;
 
             }

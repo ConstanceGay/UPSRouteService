@@ -1,6 +1,7 @@
 package Interface;
 
 import UPSRouteService.*;
+import t2s.son.LecteurTexte;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -59,8 +60,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
 
         //Reads building name out loud
-        TextToVoice voice = new TextToVoice(mouseBuilding);
-        voice.start();
+       // Runnable voice = new TextToVoice(mouseBuilding);
+       // Thread thread = new Thread (voice);
+       // thread.start();
         repaint();
     }
 
@@ -194,10 +196,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             in = new ObjectInputStream(inputStream);
             gpsDownRight = (GPSPoint) in.readObject();
 
-            System.out.println("GPS bas gauche : "+gpsDownLeft.toString());
-            System.out.println("GPS haut gauche : "+gpsUpLeft.toString());
-            System.out.println("GPS bas droit : "+gpsDownRight.toString());
-
             in.close();
             inputStream.close();
         } catch (IOException | ClassNotFoundException | ClassCastException e) {
@@ -240,13 +238,14 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     //Draws the exploration point on the map and gets the name of the building
     void setExplorationPoint (GPSPoint gpsPoint){
         explorationPoint = gpsPoint;
-        String new_building = upsRouteService.getBuilding(explorationPoint.getGraphicsPoint().getCol(),explorationPoint.getGraphicsPoint().getRow());
+        String new_building = upsRouteService.getBuilding(explorationPoint.getLongitude(),explorationPoint.getLatitude());
         if (!explorationBuilding.equals(new_building)){
-            System.out.println(explorationBuilding);
+            explorationBuilding = new_building;
             //Reads building name out loud
-            TextToVoice voice = new TextToVoice(explorationBuilding);
-            voice.start();
-            }
+            final LecteurTexte reader = new LecteurTexte();
+            TextToVoice voice = new TextToVoice(explorationBuilding,reader);
+            voice.run();
+        }
     }
 
     void setImage(String imagePath){

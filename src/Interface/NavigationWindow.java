@@ -130,8 +130,10 @@ public class NavigationWindow extends JFrame {
         steps.forEach(i -> listSelectionModel.addElement(i));
         jList.setModel(listSelectionModel);
 
-        TextToVoice voice = new TextToVoice(listSelectionModel);
-        voice.start();
+        final LecteurTexte reader = new LecteurTexte();
+        Runnable voice = new TextToVoice(listSelectionModel, reader);
+        Thread thread = new Thread(voice);
+        thread.start();
     }
 
 }

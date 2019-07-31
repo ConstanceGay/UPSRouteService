@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 public class UPSRouteService {
@@ -159,7 +160,7 @@ public class UPSRouteService {
                 else
                     return null;
             }
-        } catch (IOException | JSONException e) {
+        } catch (IOException |JSONException e) {
             e.printStackTrace();
         }
 
