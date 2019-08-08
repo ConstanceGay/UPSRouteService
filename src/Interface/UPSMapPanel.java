@@ -60,9 +60,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
 
         //Reads building name out loud
-       // Runnable voice = new TextToVoice(mouseBuilding);
-       // Thread thread = new Thread (voice);
-       // thread.start();
+        final LecteurTexte reader = new LecteurTexte();
+        TextToVoice voice = new TextToVoice(mouseBuilding,reader);
+        voice.run();
         repaint();
     }
 

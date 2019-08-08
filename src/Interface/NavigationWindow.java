@@ -101,7 +101,7 @@ public class NavigationWindow extends JFrame {
         jList.setModel(listSelectionModel);
         jList.addListSelectionListener(e -> {
             Instruction instruction = jList.getSelectedValue();
-            if (instruction != null) {
+            if (instruction != null && e.getValueIsAdjusting()) {
                 upsMapPanel.clearWayPointsToDraw();
 
                 // Retourne les points sous la forme [premier_point, dernier_point]
@@ -112,6 +112,10 @@ public class NavigationWindow extends JFrame {
                     if (!list.contains(i))
                         list.add(i);
                 }
+
+                final LecteurTexte reader = new LecteurTexte();
+                TextToVoice voice = new TextToVoice(instruction.toString(),reader);
+                voice.run();
 
                 upsMapPanel.addAllWayPointsToDraw(instruction.getWayPoints());
             }
@@ -129,11 +133,6 @@ public class NavigationWindow extends JFrame {
         listSelectionModel.removeAllElements();
         steps.forEach(i -> listSelectionModel.addElement(i));
         jList.setModel(listSelectionModel);
-
-        final LecteurTexte reader = new LecteurTexte();
-        Runnable voice = new TextToVoice(listSelectionModel, reader);
-        Thread thread = new Thread(voice);
-        thread.start();
     }
 
 }
