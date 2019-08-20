@@ -13,7 +13,7 @@ public class ModeWindow extends JFrame {
     private static CalibrationWindow calibrationWindow;
     private static NavigationWindow navigationWindow;
     private static CameraWindow cameraWindow;
-
+    private static CameraModeWindow cameraModeWindow;
 
     public ModeWindow(){
 
@@ -34,24 +34,20 @@ public class ModeWindow extends JFrame {
         navigationWindow.setVisible(false);
         cameraWindow = new CameraWindow();
         cameraWindow.setVisible(false);
+        cameraModeWindow = new CameraModeWindow();
+        cameraModeWindow.setVisible(false);
 
         JRadioButton navigationButton   = new JRadioButton("Navigation");
         JRadioButton calibrationButton    = new JRadioButton("Calibration");
         JRadioButton cameraButton    = new JRadioButton("Camera");
         JToggleButton imageButton = new JToggleButton("Image");
 
-        /*
-        ButtonGroup bgroup = new ButtonGroup();
-        bgroup.add(navigationButton);
-        bgroup.add(calibrationButton);
-        bgroup.add(cameraButton);
-        bgroup.add(imageButton); */
-
         calibrationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cameraWindow.setVisible(false);
                 cameraWindow.stopCamera();
+                cameraModeWindow.setVisible(false);
                 navigationWindow.setVisible(false);
                 calibrationWindow.setVisible(true);
             }
@@ -62,6 +58,7 @@ public class ModeWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 cameraWindow.setVisible(false);
                 cameraWindow.stopCamera();
+                cameraModeWindow.setVisible(false);
                 navigationWindow.setVisible(true);
                 calibrationWindow.setVisible(false);
             }
@@ -72,8 +69,10 @@ public class ModeWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 cameraWindow.setVisible(true);
                 cameraWindow.runCamera();
+                cameraModeWindow.setVisible(true);
                 navigationWindow.setVisible(false);
                 calibrationWindow.setVisible(false);
+
             }
         });
 

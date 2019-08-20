@@ -1,5 +1,6 @@
 package Interface;
 
+import Application.*;
 import UPSRouteService.*;
 import t2s.son.LecteurTexte;
 
@@ -10,8 +11,18 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+
+import marytts.signalproc.effects.JetPilotEffect;
+import marytts.signalproc.effects.LpcWhisperiserEffect;
+import marytts.signalproc.effects.RobotiserEffect;
+import marytts.signalproc.effects.StadiumEffect;
+import marytts.signalproc.effects.VocalTractLinearScalerEffect;
+import marytts.signalproc.effects.VolumeEffect;
+
 
 public class UPSMapPanel extends JPanel implements MouseListener{
 
@@ -19,9 +30,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private List<GPSPoint> coordinates;                                     //all the points of the path
     private UPSRouteService upsRouteService = new UPSRouteService();
 
+    //Points to draw on the map
     private GPSPoint mobileStartPointToDraw;                                //Start of the path point
     private GPSPoint mobileEndPointToDraw;                                  //End of path point
     private GPSPoint explorationPoint;                                      //Exploration point
+    private GPSPoint navigationPoint;                                       //point of navigation on the path
 
     private List<Integer> wayPointsToDraw = new LinkedList<>();             //points of the path selected by user
     private Path steps;                                                     //Navigation instructions
@@ -42,6 +55,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private int scaleWidth;
     private int xOffset;
 
+    //Variables for navigation mode with camera
+    private boolean routeConfirmed = false;
+    private int instructionNumber;
+
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
@@ -60,9 +77,18 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
 
         //Reads building name out loud
+        /*
         final LecteurTexte reader = new LecteurTexte();
         TextToVoice voice = new TextToVoice(mouseBuilding,reader);
-        voice.run();
+        voice.run();    */
+
+        /*
+        TextToSpeech tts = new TextToSpeech();
+
+        tts.setVoice("cmu-rms-hsmm");
+        tts.speak("Hey man.", 2.0f, false, true);
+         */
+
         repaint();
     }
 
@@ -158,6 +184,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             g.fillOval(mobileStartPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileStartPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
         }
 
+        if (navigationPoint != null){
+            g.setColor(Color.BLACK);
+            g.fillOval(navigationPoint.getGraphicsPoint().getCol() + xOffset - 5, navigationPoint.getGraphicsPoint().getRow() - 5, 10, 10);
+        }
+
         //draws the exploration point in YELLOW
         if (explorationPoint != null){
             g.setColor(Color.YELLOW);
@@ -207,8 +238,24 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     }
 
+    //FUNCTIONS TO SET THE DIFFERENT POINTS
+
     void setMobileStartPointToDraw(GPSPoint gpsPoint) {
-        if(mobileStartPointToDraw != null) {
+        //If we are in navigation mode and the route has been set
+        if (routeConfirmed){
+            if(navigationPoint != null){
+                Boolean isDif = (gpsPoint.getLongitude() != navigationPoint.getLongitude()) || (gpsPoint.getLatitude() != navigationPoint.getLatitude());
+                if (isDif) {
+                    navigationPoint = gpsPoint;
+                    int closestPoint = closestPathPoint(gpsPoint);
+                    String instruction = instructionToSay(gpsPoint, closestPoint);
+                    System.out.println(instruction);
+                }
+            } else{
+                navigationPoint = gpsPoint;
+            }
+
+        } else if (mobileStartPointToDraw != null) {
             Boolean isDif = (gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude());
             if (isDif) {
                 mobileStartPointToDraw = gpsPoint;
@@ -222,7 +269,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     }
 
     void setMobileEndPointToDraw(GPSPoint gpsPoint) {
-        if(mobileEndPointToDraw != null) {
+        if(mobileEndPointToDraw != null && !routeConfirmed) {
             Boolean isDif = (gpsPoint.getLongitude() != mobileEndPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileEndPointToDraw.getLatitude());
             if (isDif) {
                 mobileEndPointToDraw = gpsPoint;
@@ -248,10 +295,70 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         }
     }
 
-    void setImage(String imagePath){
-        this.imagePath = imagePath;
+    boolean setRouteConfirm (){
+        if ( !(mobileEndPointToDraw==null) && !(mobileStartPointToDraw==null) ){
+            this.routeConfirmed = true;
+            return true;
+        } else{
+            return false;
+        }
     }
 
+    void resetRouteConfirm (){ this.routeConfirmed = false;}
+
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    /*::                          NAVIGATION                            :*/
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+    int closestPathPoint(GPSPoint curPoint){
+        double min = 1200;                                  //used the max distance on map
+        int pointNumber = -1;
+
+        for (int i=0; i<coordinates.size();i++){
+            GPSPoint aux = coordinates.get(i);
+            double distance = curPoint.distanceGPSPoint(aux);
+            if (distance <= min){
+                min = distance;
+                pointNumber = i;
+            }
+        }
+        return pointNumber;
+    }
+
+    String instructionToSay (GPSPoint curPoint,int closestPoint){
+        String instruction = "";
+
+        if (curPoint.distanceGPSPoint(coordinates.get(closestPoint)) >= 20){
+            instruction = "Faites demi-tour";
+        } else if (closestPoint == coordinates.size()-1  ){                    //if it is the last point
+            instruction = "Vous êtes arrivé";
+        } else {
+            //we find out if the point is the first of an instruction
+            List<Instruction> instruList = steps.getInstructions();
+            ListIterator<Instruction> it = instruList.listIterator();
+            int instruNum = -1;
+            boolean trouve = false;
+            Instruction aux;
+            while(it.hasNext() && !trouve){
+                aux = it.next();
+                if (aux.getWayPoints().get(0) == closestPoint){
+                    instruNum = instruList.indexOf(aux);
+                    trouve = true;
+                }
+            }
+
+            if(trouve && instruNum == instructionNumber+1){
+                instructionNumber ++;
+                instruction = instruList.get(instruNum).toString();
+            }
+        }
+        return instruction;
+    }
+
+    //FUNCTION TO CHANGE THE IMAGE ON THE MAP WINDOW (MAP OR BLACK)
+    void setImage(String imagePath){ this.imagePath = imagePath; }
+
+    //FUNCTIONS TO SET THE SELECTED POINTS (in the instructions list
     void addAllWayPointsToDraw(List<Integer> points) {
         wayPointsToDraw.addAll(points);
     }
@@ -266,19 +373,11 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
 
-    public GPSPoint getGpsDownLeft() {
-        return gpsDownLeft;
-    }
-
-    public GPSPoint getGpsDownRight() {
-        return gpsDownRight;
-    }
-
+    public GPSPoint getGpsDownLeft() {return gpsDownLeft; }
+    public GPSPoint getGpsDownRight() { return gpsDownRight; }
     public GPSPoint getGpsUpLeft() { return gpsUpLeft; }
 
-    Path getSteps() {
-        return steps;
-    }
+    Path getSteps() { return steps; }
 
     int getDuration() { return duration; }
 

@@ -40,17 +40,33 @@ public class GPSPoint implements Serializable {
         return new GraphicsPoint((int)(tx * Main.getMapWindow().getMapPanel().getScaleWidth()), (int)((1-ty) * Main.getMapWindow().getMapPanel().getHeight()));
     }
 
-    public double getLatitude() {
-        return latitude;
+    //FUNCTIONS TO CALCULATE DISTANCE BETWEEN TWO GPS POINTS
+
+    public double distanceGPSPoint (GPSPoint gpsPoint) {
+        double theta = this.longitude - gpsPoint.getLongitude();
+        double dist = Math.sin(deg2rad(this.latitude)) * Math.sin(deg2rad(gpsPoint.getLatitude())) + Math.cos(deg2rad(this.latitude)) * Math.cos(deg2rad(gpsPoint.getLatitude())) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344 * 1000;             //converts to m
+
+        return dist;
     }
 
-    public double getLongitude() {
-        return longitude;
-    }
+    private double deg2rad(double deg) { return (deg * Math.PI / 180.0); }
 
-    public void setLatitude(double latitude){
-        this.latitude = latitude;
-    }
+    private double rad2deg(double rad) { return (rad * 180.0 / Math.PI); }
+
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    /*::  GETTERS            :*/
+    public double getLatitude() { return latitude; }
+
+    public double getLongitude() { return longitude; }
+
+    /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+    /*::  SETTERS            :*/
+
+    public void setLatitude(double latitude){ this.latitude = latitude; }
 
     public void setLongitude(double longitude){
         this.longitude = longitude;

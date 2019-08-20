@@ -12,13 +12,14 @@ public class Path implements Iterable<Instruction> {
         instructions.add(instruction);
     }
 
+    public List<Instruction> getInstructions(){ return instructions; }
+
     public String toString() {
         return instructions.toString();
     }
 
     @Override
-    public Iterator<Instruction> iterator() {
-        return instructions.iterator();
+    public Iterator<Instruction> iterator() { return instructions.iterator();
     }
 
 }
