@@ -57,12 +57,13 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     //Variables for navigation mode with camera
     private boolean routeConfirmed = false;
-    private int instructionNumber;
+    private int instructionNumber = 1;
 
 
     UPSMapPanel(Location start, Location end) {
         addMouseListener(this);
         loadGpsConfig();
+
         instructionWindow = new InstructionWindow(0,0,new Path());
         drawRoute(start, end);
         this.setBackground(Color.BLACK);
@@ -125,7 +126,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             String endBuilding = upsRouteService.getBuilding(end.getLongitude(),end.getLatitude());
             instructionWindow.refresh(upsRoute.getDistance(),upsRoute.getDuration(),upsRoute.getSteps(),startBuilding,endBuilding);
             instructionWindow.setVisible(true);
+            steps = upsRoute.getSteps();
             coordinates = upsRoute.getCoordinates();
+            distance = upsRoute.getDistance();
+            duration = upsRoute.getDuration();
         }
     }
 
@@ -172,6 +176,14 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
             g2.drawLine(coordinates.get(i).getGraphicsPoint().getCol() + xOffset, coordinates.get(i).getGraphicsPoint().getRow(),
                     coordinates.get(i + 1).getGraphicsPoint().getCol() + xOffset, coordinates.get(i + 1).getGraphicsPoint().getRow());
+        }
+
+        //NEXT STEP
+        if (routeConfirmed){
+            g2.setStroke(new BasicStroke(2));
+            g.setColor(Color.BLACK);
+            GPSPoint nextPoint = coordinates.get(steps.getInstructions().get(instructionNumber).getWayPoints().get(0));
+            g.drawOval(nextPoint.getGraphicsPoint().getCol() - 2 + xOffset, nextPoint.getGraphicsPoint().getRow() - 2, 4, 4);
         }
 
         //draws the end point of the path in BLUE
@@ -249,7 +261,12 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     navigationPoint = gpsPoint;
                     int closestPoint = closestPathPoint(gpsPoint);
                     String instruction = instructionToSay(gpsPoint, closestPoint);
-                    System.out.println(instruction);
+                    if (!instruction.equals("")){
+                        final LecteurTexte reader = new LecteurTexte();
+                        TextToVoice voice = new TextToVoice(instruction,reader);
+                        voice.run();
+                        System.out.println(instruction);
+                    }
                 }
             } else{
                 navigationPoint = gpsPoint;
@@ -304,7 +321,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         }
     }
 
-    void resetRouteConfirm (){ this.routeConfirmed = false;}
+    void resetRouteConfirm (){
+        this.routeConfirmed = false;
+        instructionNumber = 1;
+    }
 
     /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
     /*::                          NAVIGATION                            :*/
@@ -332,6 +352,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             instruction = "Faites demi-tour";
         } else if (closestPoint == coordinates.size()-1  ){                    //if it is the last point
             instruction = "Vous êtes arrivé";
+            resetRouteConfirm();
         } else {
             //we find out if the point is the first of an instruction
             List<Instruction> instruList = steps.getInstructions();
@@ -347,9 +368,13 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                 }
             }
 
-            if(trouve && instruNum == instructionNumber+1){
+            if(trouve && instruNum == instructionNumber){
                 instructionNumber ++;
                 instruction = instruList.get(instruNum).toString();
+                if (instruction == null){
+                    instruction = "";
+                    //TODO
+                }
             }
         }
         return instruction;

@@ -6,9 +6,9 @@ public class Vecteur2D {
 
     private double x;
     private double y;
-    private Coordinate GPS_BG = new Coordinate(1.460408, 43.555438);
-    private Coordinate GPS_BD = new Coordinate(1.480020, 43.555438);
-    private Coordinate GPS_HG = new Coordinate(1.46726, 43.565650);
+    private Coordinate GPS_BG = new Coordinate(1.461643,43.562777);
+    private Coordinate GPS_BD = new Coordinate(1.468724,43.555375);
+    private Coordinate GPS_HG = new Coordinate(1.468209,43.566174);
     private static final Vecteur2D HG = new Vecteur2D(0, 0);
 
     public Vecteur2D() {
