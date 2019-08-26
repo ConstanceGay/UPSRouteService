@@ -1,5 +1,6 @@
 package Interface;
 
+import Application.TextToSpeech;
 import UPSRouteService.Instruction;
 import UPSRouteService.Location;
 import UPSRouteService.Path;
@@ -113,9 +114,14 @@ public class NavigationWindow extends JFrame {
                         list.add(i);
                 }
 
+                /*
                 final LecteurTexte reader = new LecteurTexte();
                 TextToVoice voice = new TextToVoice(instruction.toString(),reader);
                 voice.run();
+                */
+                TextToSpeech tts = new TextToSpeech();
+                tts.setVoice("upmc-pierre-hsmm");
+                tts.speak(instruction.toString(), 2.0f, false, true);
 
                 upsMapPanel.addAllWayPointsToDraw(instruction.getWayPoints());
             }

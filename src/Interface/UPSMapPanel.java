@@ -83,12 +83,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         TextToVoice voice = new TextToVoice(mouseBuilding,reader);
         voice.run();    */
 
-        /*
         TextToSpeech tts = new TextToSpeech();
-
-        tts.setVoice("cmu-rms-hsmm");
-        tts.speak("Hey man.", 2.0f, false, true);
-         */
+        tts.setVoice("upmc-pierre-hsmm");
+        tts.speak(mouseBuilding, 2.0f, false, true);
 
         repaint();
     }
@@ -262,9 +259,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                     int closestPoint = closestPathPoint(gpsPoint);
                     String instruction = instructionToSay(gpsPoint, closestPoint);
                     if (!instruction.equals("")){
-                        final LecteurTexte reader = new LecteurTexte();
-                        TextToVoice voice = new TextToVoice(instruction,reader);
-                        voice.run();
+                        TextToSpeech tts = new TextToSpeech();
+                        tts.setVoice("upmc-pierre-hsmm");
+                        tts.speak(instruction, 2.0f, false, true);
                         System.out.println(instruction);
                     }
                 }
@@ -306,9 +303,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         if (!explorationBuilding.equals(new_building)){
             explorationBuilding = new_building;
             //Reads building name out loud
-            final LecteurTexte reader = new LecteurTexte();
-            TextToVoice voice = new TextToVoice(explorationBuilding,reader);
-            voice.run();
+            TextToSpeech tts = new TextToSpeech();
+            tts.setVoice("upmc-pierre-hsmm");
+            tts.speak(explorationBuilding, 2.0f, false, true);
         }
     }
 
