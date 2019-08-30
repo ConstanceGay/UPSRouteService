@@ -61,6 +61,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
 
     UPSMapPanel(Location start, Location end) {
+
         addMouseListener(this);
         loadGpsConfig();
 
@@ -77,15 +78,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
         mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
 
-        //Reads building name out loud
-        /*
-        final LecteurTexte reader = new LecteurTexte();
-        TextToVoice voice = new TextToVoice(mouseBuilding,reader);
-        voice.run();    */
-
         TextToSpeech tts = new TextToSpeech();
         tts.setVoice("upmc-pierre-hsmm");
-        tts.speak(mouseBuilding, 2.0f, false, true);
+        tts.speak(convertBuildingName(mouseBuilding), 2.0f, false, true);
 
         repaint();
     }
@@ -305,12 +300,15 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             //Reads building name out loud
             TextToSpeech tts = new TextToSpeech();
             tts.setVoice("upmc-pierre-hsmm");
-            tts.speak(explorationBuilding, 2.0f, false, true);
+            tts.speak(convertBuildingName(explorationBuilding), 2.0f, false, true);
         }
     }
 
     boolean setRouteConfirm (){
         if ( !(mobileEndPointToDraw==null) && !(mobileStartPointToDraw==null) ){
+            TextToSpeech tts = new TextToSpeech();
+            tts.setVoice("upmc-pierre-hsmm");
+            tts.speak(steps.getInstructions().get(0).toString(), 2.0f, false, true);
             this.routeConfirmed = true;
             return true;
         } else{
@@ -362,7 +360,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                 if (aux.getWayPoints().get(0) == closestPoint){
                     instruNum = instruList.indexOf(aux);
                     trouve = true;
-                }
+            }
             }
 
             if(trouve && instruNum == instructionNumber){
@@ -379,6 +377,25 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     //FUNCTION TO CHANGE THE IMAGE ON THE MAP WINDOW (MAP OR BLACK)
     void setImage(String imagePath){ this.imagePath = imagePath; }
+
+    //FUNCTION TO CHANGE THE NAME OF A BUILDING SO IT WILL BE PRONOUNCED RIGHT BY MARY TTS
+    String convertBuildingName (String name){
+        String convName = name;
+        if(!name.equals("IRIT")) {
+            convName="";
+            String[] words = name.split(" ");
+            for(int i=0;i<=words.length-1;i++){
+                String curWord = words[i];
+                //if the word only has capital letters,numbers and parentheses then
+                if(words[i].matches("^[\\(]?[A-Z0-9]*[\\)]?$")){
+                    //adds spaces in between
+                    curWord = curWord.replaceAll(".(?=.)", "$0 ");
+                }
+                convName = convName.concat(" "+curWord);
+            }
+        }
+        return convName;
+    }
 
     //FUNCTIONS TO SET THE SELECTED POINTS (in the instructions list
     void addAllWayPointsToDraw(List<Integer> points) {
