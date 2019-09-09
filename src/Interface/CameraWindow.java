@@ -2,32 +2,33 @@ package Interface;
 
 import javax.swing.*;
 
-public class CameraWindow extends JFrame {
+/**
+ * Window displaying the camera view
+ */
+class CameraWindow extends JFrame {
 
     private static UPSCameraPanel upsCameraPanel =null;
 
-    public CameraWindow() {
+    CameraWindow() {
         super();
-        this.setTitle("Vue Caméra");
+        this.setTitle("Vue Camera");
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void runCamera() {
+    //Setting the camera window to visible
+    void runCamera() {
         upsCameraPanel = new UPSCameraPanel();
         this.add(upsCameraPanel);
         this.pack();
         this.setVisible(true);
     }
 
-    public void stopCamera(){
+    //Turning off the camera
+    void stopCamera(){
         if (upsCameraPanel!=null) {
             upsCameraPanel.stopCamera();
         }
-    }
-
-    public static UPSCameraPanel getUpsCameraPanel() {
-        return upsCameraPanel;
     }
 
 }

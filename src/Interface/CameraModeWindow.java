@@ -4,12 +4,14 @@ import Application.Main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class CameraModeWindow extends JFrame{
+/**
+ * Window allowing the user to validate the path he has chosen via the TOPCODES
+ */
 
-    public CameraModeWindow() {
+class CameraModeWindow extends JFrame{
+
+    CameraModeWindow() {
 
         this.setTitle("Mode d'utilisation de la maquette");
         this.setSize(600, 240);
@@ -27,29 +29,12 @@ public class CameraModeWindow extends JFrame{
         JRadioButton explorationButton  = new JRadioButton("Exploration");
         JToggleButton confirmButton = new JToggleButton("Valider le parcours");
 
-        navigationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO
-            }
-        });
-
-        explorationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO
-            }
-        });
-
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean selected = confirmButton.getModel().isSelected();
-                if (!selected){
-                    Main.getMapWindow().getMapPanel().resetRouteConfirm();
-                } else if (!Main.getMapWindow().getMapPanel().setRouteConfirm()){
-                    confirmButton.getModel().setSelected(false);
-                }
+        confirmButton.addActionListener(e -> {
+            boolean selected = confirmButton.getModel().isSelected();
+            if (!selected){
+                Main.getMapWindow().getMapPanel().resetRouteConfirm();
+            } else if (!Main.getMapWindow().getMapPanel().setRouteConfirm()){
+                confirmButton.getModel().setSelected(false);
             }
         });
 

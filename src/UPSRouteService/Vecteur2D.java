@@ -9,24 +9,10 @@ public class Vecteur2D {
     private Coordinate GPS_BG = new Coordinate(1.461643,43.562777);
     private Coordinate GPS_BD = new Coordinate(1.468724,43.555375);
     private Coordinate GPS_HG = new Coordinate(1.468209,43.566174);
-    private static final Vecteur2D HG = new Vecteur2D(0, 0);
 
-    public Vecteur2D() {
-        x = 0.0;
-        y = 0.0;
-    }
-
-    public Vecteur2D(double dx, double dy) {
+    private Vecteur2D(double dx, double dy) {
         x = dx;
         y = dy;
-    }
-
-    public Vecteur2D(double dx, double dy, Coordinate gpsDownLeft, Coordinate gpsDownRight, Coordinate gpsUpLeft) {
-        x = dx;
-        y = dy;
-        GPS_BD = gpsDownRight;
-        GPS_BG = gpsDownLeft;
-        GPS_HG = gpsUpLeft;
     }
 
     public Vecteur2D(double dx, double dy, GPSPoint gpsDownLeft, GPSPoint gpsDownRight, GPSPoint gpsUpLeft) {
@@ -35,23 +21,6 @@ public class Vecteur2D {
         GPS_BD = new Coordinate(gpsDownRight.getLongitude(), gpsDownRight.getLatitude());
         GPS_BG = new Coordinate(gpsDownLeft.getLongitude(), gpsDownLeft.getLatitude());
         GPS_HG = new Coordinate(gpsUpLeft.getLongitude(), gpsUpLeft.getLatitude());
-    }
-
-    public double norme() {
-        return (Math.sqrt(x*x + y*y));
-    }
-
-    private double sommeCarres() {
-        return (x*x + y*y);
-    }
-
-    public Vecteur2D normer() {
-        double norme = Math.sqrt(sommeCarres());
-        return new Vecteur2D(x / norme, y / norme);
-    }
-
-    public double produitScalaire(Vecteur2D v) {
-        return (x * v.x) + (y * v.y);
     }
 
     public  Vecteur2D vue2gps() {
@@ -64,30 +33,6 @@ public class Vecteur2D {
         // appliquer tx et ty aux coordonnées GPS
         return new Vecteur2D(GPS_BG.getX() + tx * GPS_BG_BD.getX() + ty * GPS_BG_HG.getX(),
                 GPS_BG.getY() + tx * GPS_BG_BD.getY() + ty * GPS_BG_HG.getY());
-    }
-
-    public Vecteur2D gps2vue() {
-        Coordinate GPS_BG_BD = new Coordinate(GPS_BD.getX() - GPS_BG.getX(), GPS_BD.getY() - GPS_BG.getY());
-        Coordinate GPS_BG_HG = new Coordinate(GPS_HG.getX() - GPS_BG.getX(), GPS_HG.getY() - GPS_BG.getY());
-
-        Vecteur2D W = new Vecteur2D(this.x - GPS_BG.getX(), this.y - GPS_BG.getY());
-        Vecteur2D pt =  new Vecteur2D();
-
-        double A = GPS_BG_HG.getSquaredSum();
-        double D = GPS_BG_BD.getSquaredSum();
-        double B = ((GPS_BG_BD.getX() * GPS_BG_HG.getX()) + (GPS_BG_BD.getY() * GPS_BG_HG.getY()));
-        double det = (A * D) - (B * B);
-
-        B = -1*B;
-        det = 1/det;
-
-        double tx = det * ((A*GPS_BG_BD.getX() + B*GPS_BG_HG.getX())*W.x + (A*GPS_BG_BD.getY() + B*GPS_BG_HG.getY())*W.y);
-        double ty = det * ((B*GPS_BG_BD.getX() + D*GPS_BG_HG.getX())*W.x + (B*GPS_BG_BD.getY() + D*GPS_BG_HG.getY())*W.y);
-
-        pt.x = tx * Main.getMapWindow().getMapPanel().getScaleWidth();
-        pt.y = (1-ty) * Main.getMapWindow().getHeight();
-
-        return pt;
     }
 
     public double getX() {

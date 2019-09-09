@@ -1,15 +1,15 @@
 package Interface;
 
-import UPSRouteService.Instruction;
 import UPSRouteService.Location;
-import UPSRouteService.Path;
-import UPSRouteService.Profile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.List;
+
+/**
+ * Window displaying the map
+ */
 
 public class MapWindow extends JFrame {
 
@@ -18,7 +18,7 @@ public class MapWindow extends JFrame {
 
     public MapWindow() {
         super();
-        this.setTitle("Maquette UPS");
+        this.setTitle("Carte de l'UPS");
         this.setSize(940, 655);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
@@ -70,7 +70,4 @@ public class MapWindow extends JFrame {
     public UPSMapPanel getMapPanel() {
         return upsMapPanel;
     }
-
-
-
 }

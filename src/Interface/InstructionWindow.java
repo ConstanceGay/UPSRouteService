@@ -1,15 +1,16 @@
 package Interface;
 
 import UPSRouteService.Instruction;
-import UPSRouteService.Location;
 import UPSRouteService.Path;
-import UPSRouteService.Profile;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-public class InstructionWindow extends JFrame{
+/**
+ * Window giving the navigation instructions for a topcode path
+ */
+
+class InstructionWindow extends JFrame{
 
     private DefaultListModel<Instruction> listSelectionModel = new DefaultListModel<>();
     private JLabel distanceLabel;
@@ -18,7 +19,7 @@ public class InstructionWindow extends JFrame{
     private JLabel endBuildingLabel;
     private JList<Instruction> jList;
 
-    public InstructionWindow(int distance, int duration, Path steps) {
+    InstructionWindow(int distance, int duration, Path steps) {
         //super();
         this.setTitle("Instruction UPS");
         this.setSize(600, 240);
@@ -71,7 +72,7 @@ public class InstructionWindow extends JFrame{
         this.add(jScrollPane);
     }
 
-    public void refresh(int distance, int duration, Path steps, String startBuilding, String endBuilding) {
+    void refresh(int distance, int duration, Path steps, String startBuilding, String endBuilding) {
         startBuildingLabel.setText("Départ : "+ startBuilding);
         endBuildingLabel.setText("Arrivée : "+endBuilding);
         durationLabel.setText("Durée : " + duration +" minute(s)");

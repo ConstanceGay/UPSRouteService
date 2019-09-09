@@ -13,6 +13,10 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * Panel containing the camera view and handling the topcodes
+ */
+
 public class UPSCameraPanel extends JPanel {
 
     private Webcam webcam = Webcam.getWebcams().get(Webcam.getWebcams().size() - 1);
@@ -20,8 +24,6 @@ public class UPSCameraPanel extends JPanel {
     private GraphicsPoint coordinateY = new GraphicsPoint();
     private GraphicsPoint coordinateOrigin = new GraphicsPoint();
     private GraphicsPoint explorationPoint= new GraphicsPoint();
-    private double mapWidth;
-    private double mapHeight;
 
     UPSCameraPanel() {
         super();
@@ -40,7 +42,8 @@ public class UPSCameraPanel extends JPanel {
         new Timer(delay, taskPerformer).start();
     }
 
-    public void stopCamera(){
+    //Turns off the webcam
+    void stopCamera(){
         if (webcam.isOpen()){
             webcam.close();
         }
@@ -113,6 +116,7 @@ public class UPSCameraPanel extends JPanel {
         });
     }
 
+    //Gets the equivalent coordinate of the topcode on the map
     private GraphicsPoint getCoordinateOnMap(TopCode topCode) {
         Coordinate point = new Coordinate(topCode.getCenterX(), topCode.getCenterY());
         Coordinate originToX = new Coordinate(coordinateX.getCol() - coordinateOrigin.getCol(),
@@ -125,12 +129,13 @@ public class UPSCameraPanel extends JPanel {
         double ty = (originToY.getX() * (point.getX() - coordinateOrigin.getCol())
                 + originToY.getY() * (point.getY() - coordinateOrigin.getRow())) / originToY.getSquaredSum();
 
-        mapWidth = coordinateOrigin.getDistanceFrom(coordinateX);
-        mapHeight = coordinateOrigin.getDistanceFrom(coordinateY);
+        double mapWidth = coordinateOrigin.getDistanceFrom(coordinateX);
+        double mapHeight = coordinateOrigin.getDistanceFrom(coordinateY);
 
         return new GraphicsPoint((int)(tx * mapWidth), (int)(ty * mapHeight));
     }
 
+    // gets the GPS coordinates of the topcode from its coordinates on the map
     private GPSPoint getGpsFromCoordinateOnMap(GraphicsPoint coordinate) {
         GPSPoint gpsDownRight = Main.getMapWindow().getMapPanel().getGpsDownRight();
         GPSPoint gpsDownLeft = Main.getMapWindow().getMapPanel().getGpsDownLeft();
@@ -146,14 +151,6 @@ public class UPSCameraPanel extends JPanel {
         // appliquer tx et ty aux coordonnées GPS
         return new GPSPoint(gpsDownLeft.getLongitude() + tx * GPS_BG_BD.getLongitude() + ty * GPS_BG_HG.getLongitude(),
                 gpsDownLeft.getLatitude() + tx * GPS_BG_BD.getLatitude() + ty * GPS_BG_HG.getLatitude());
-    }
-
-    public double getMapWidth() {
-        return mapWidth;
-    }
-
-    public double getMapHeight() {
-        return mapHeight;
     }
 
 }

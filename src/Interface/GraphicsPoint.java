@@ -1,5 +1,9 @@
 package Interface;
 
+/**
+ * A class for the row and column numbers of points on the map
+ */
+
 public class GraphicsPoint {
 
     private int row;

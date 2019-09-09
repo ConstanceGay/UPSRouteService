@@ -1,11 +1,12 @@
 package Interface;
 
 import Application.Main;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+/**
+ * Window allowing the user to choose which mode he wants to use the app for : camera, navigation or calibration
+ */
 
 public class ModeWindow extends JFrame {
 
@@ -16,7 +17,6 @@ public class ModeWindow extends JFrame {
     private static CameraModeWindow cameraModeWindow;
 
     public ModeWindow(){
-
         super();
         this.setTitle("Mode de Navigation");
         this.setSize(600, 240);
@@ -42,52 +42,38 @@ public class ModeWindow extends JFrame {
         JRadioButton cameraButton    = new JRadioButton("Camera");
         JToggleButton imageButton = new JToggleButton("Image");
 
-        calibrationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        calibrationButton.addActionListener(e ->  {
                 cameraWindow.setVisible(false);
                 cameraWindow.stopCamera();
                 cameraModeWindow.setVisible(false);
                 navigationWindow.setVisible(false);
                 calibrationWindow.setVisible(true);
-            }
         });
 
-        navigationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        navigationButton.addActionListener(e -> {
                 cameraWindow.setVisible(false);
                 cameraWindow.stopCamera();
                 cameraModeWindow.setVisible(false);
                 navigationWindow.setVisible(true);
                 calibrationWindow.setVisible(false);
-            }
         });
 
-        cameraButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        cameraButton.addActionListener(e -> {
                 cameraWindow.setVisible(true);
                 cameraWindow.runCamera();
                 cameraModeWindow.setVisible(true);
                 navigationWindow.setVisible(false);
                 calibrationWindow.setVisible(false);
-
-            }
         });
 
-        imageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        imageButton.addActionListener(e -> {
                 boolean selected = imageButton.getModel().isSelected();
                 if (!selected){
                     Main.getMapWindow().getMapPanel().setImage("/ups-map-9x6.png");
                 } else{
                     Main.getMapWindow().getMapPanel().setImage("/black_map.png");
                 }
-            }
         });
-
 
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new GridLayout(4, 1));

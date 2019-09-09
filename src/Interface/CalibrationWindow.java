@@ -11,14 +11,17 @@ import java.io.ObjectOutputStream;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class CalibrationWindow extends JDialog {
+/**
+ * Window allowing the user to adjust the coordinates of the corner of the map
+ */
 
-    public CalibrationWindow() {
+class CalibrationWindow extends JDialog {
+
+    CalibrationWindow() {
         super();
         this.setTitle("Calibrage");
         this.setSize(240, 310);
         this.setResizable(false);
-
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
         this.add(createConfig("Haut Gauche", Main.getMapWindow().getMapPanel().getGpsUpLeft()));

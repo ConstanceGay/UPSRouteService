@@ -5,14 +5,17 @@ import UPSRouteService.Instruction;
 import UPSRouteService.Location;
 import UPSRouteService.Path;
 import UPSRouteService.Profile;
-import t2s.son.LecteurTexte;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Iterator;
 import java.util.List;
 
-public class NavigationWindow extends JFrame {
+/**
+ * Window allowing the user to choose on screen his point of departure and arrival
+ * it will also display the path information and instructions
+ */
+
+class NavigationWindow extends JFrame {
 
     private UPSMapPanel upsMapPanel;
     private DefaultListModel<Instruction> listSelectionModel = new DefaultListModel<>();
@@ -20,7 +23,7 @@ public class NavigationWindow extends JFrame {
     private JLabel durationLabel;
     private JList<Instruction> jList;
 
-    public NavigationWindow(UPSMapPanel upsMapPanel) {
+    NavigationWindow(UPSMapPanel upsMapPanel) {
         super();
         this.setTitle("Navigation UPS");
         this.setSize(600, 240);
@@ -114,11 +117,6 @@ public class NavigationWindow extends JFrame {
                         list.add(i);
                 }
 
-                /*
-                final LecteurTexte reader = new LecteurTexte();
-                TextToVoice voice = new TextToVoice(instruction.toString(),reader);
-                voice.run();
-                */
                 TextToSpeech tts = new TextToSpeech();
                 tts.setVoice("upmc-pierre-hsmm");
                 tts.speak(instruction.toString(), 2.0f, false, true);

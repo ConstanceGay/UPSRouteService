@@ -2,7 +2,6 @@ package Interface;
 
 import Application.*;
 import UPSRouteService.*;
-import t2s.son.LecteurTexte;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,18 +10,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import marytts.signalproc.effects.JetPilotEffect;
-import marytts.signalproc.effects.LpcWhisperiserEffect;
-import marytts.signalproc.effects.RobotiserEffect;
-import marytts.signalproc.effects.StadiumEffect;
-import marytts.signalproc.effects.VocalTractLinearScalerEffect;
-import marytts.signalproc.effects.VolumeEffect;
-
+/**
+ * Panel handling the map and all the points that will be added to it (path, departure, arrival...)
+ */
 
 public class UPSMapPanel extends JPanel implements MouseListener{
 
@@ -49,82 +43,27 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private String explorationBuilding = "";                                //building selected by topcode
 
     private InstructionWindow instructionWindow;                            //Window to display route information
-    private int distance;
-    private int duration;
+    private int distance;                                                   //Length (in meters) of the path
+    private int duration;                                                   //Length (in minutes) to use the path
 
     private int scaleWidth;
     private int xOffset;
 
-    //Variables for navigation mode with camera
-    private boolean routeConfirmed = false;
-    private int instructionNumber = 1;
+    //Variables for guiding mode with camera
+    private boolean routeConfirmed = false;                                 //if the user has confirmed this path
+    private int instructionNumber = 1;                                      //which instruction the user is on
+    private int numTurnBack = 0;                                            //number of times they were told to turn back
 
 
     UPSMapPanel(Location start, Location end) {
-
         addMouseListener(this);
         loadGpsConfig();
-
         instructionWindow = new InstructionWindow(0,0,new Path());
         drawRoute(start, end);
         this.setBackground(Color.BLACK);
     }
 
-    @Override
-    public void mouseClicked(MouseEvent evt) {
-        mouseCoordinate.setX(evt.getPoint().x);
-        mouseCoordinate.setY(evt.getPoint().y);
-        Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY(),gpsDownLeft,gpsDownRight,gpsUpLeft);
-        Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
-        mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
-
-        TextToSpeech tts = new TextToSpeech();
-        tts.setVoice("upmc-pierre-hsmm");
-        tts.speak(convertBuildingName(mouseBuilding), 2.0f, false, true);
-
-        repaint();
-    }
-
-    void setProfile(Profile profile) {
-        upsRouteService.setProfile(profile);
-    }
-
-    //Draws the route for a path selected with the application
-    void drawRoute(Location start, Location end) {
-        instructionWindow.setVisible(false);
-        mobileStartPointToDraw = null;
-        mobileEndPointToDraw = null;
-        UPSRoute upsRoute = upsRouteService.getRoute(start, end);
-
-        if (upsRoute != null) {
-            steps = upsRoute.getSteps();
-            coordinates = upsRoute.getCoordinates();
-            distance = upsRoute.getDistance();
-            duration = upsRoute.getDuration();
-        }
-        else
-            JOptionPane.showMessageDialog(this,
-                    "Impossible de trouver un itinéraire avec ces paramètres de navigation.",
-                    "Impossible de trouver le chemin",
-                    JOptionPane.ERROR_MESSAGE);
-    }
-
-    //Draws the route for a path selected using the camera and topcodes
-    private void drawRoute(GPSPoint start, GPSPoint end) {
-        UPSRoute upsRoute = upsRouteService.getRoute(start, end);
-
-        if (upsRoute != null) {
-            String startBuilding = upsRouteService.getBuilding(start.getLongitude(),start.getLatitude());
-            String endBuilding = upsRouteService.getBuilding(end.getLongitude(),end.getLatitude());
-            instructionWindow.refresh(upsRoute.getDistance(),upsRoute.getDuration(),upsRoute.getSteps(),startBuilding,endBuilding);
-            instructionWindow.setVisible(true);
-            steps = upsRoute.getSteps();
-            coordinates = upsRoute.getCoordinates();
-            distance = upsRoute.getDistance();
-            duration = upsRoute.getDuration();
-        }
-    }
-
+    //Function called to redraw the components
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -150,6 +89,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             e.printStackTrace();
         }
 
+        //Adding the label of the building the mouse has clicked on
         if (mouseBuilding != null) {
             g.drawString(mouseBuilding, (int) mouseCoordinate.getX(), (int) mouseCoordinate.getY());
         }
@@ -195,9 +135,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
         //draws the exploration point in YELLOW
         if (explorationPoint != null){
-            g.setColor(Color.YELLOW);
+            g.setColor(Color.MAGENTA);
             g.fillOval(explorationPoint.getGraphicsPoint().getCol() + xOffset - 5, explorationPoint.getGraphicsPoint().getRow() - 5, 10, 10);
             if (explorationBuilding != null){
+                g.setColor(Color.BLACK);
                 g.drawString(explorationBuilding, explorationPoint.getGraphicsPoint().getCol() + xOffset - 5, explorationPoint.getGraphicsPoint().getRow() - 5);
             }
         }
@@ -206,6 +147,63 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         if (mobileEndPointToDraw != null) {
             g.setColor(Color.RED);
             g.fillOval(mobileEndPointToDraw.getGraphicsPoint().getCol() + xOffset - 5, mobileEndPointToDraw.getGraphicsPoint().getRow() - 5, 10, 10);
+        }
+    }
+
+    //Event if the mouse has been clicked on the map, which will display the name of the building
+    @Override
+    public void mouseClicked(MouseEvent evt) {
+        mouseCoordinate.setX(evt.getPoint().x);
+        mouseCoordinate.setY(evt.getPoint().y);
+        Vecteur2D mouse_coordinates = new Vecteur2D(mouseCoordinate.getX(),mouseCoordinate.getY(),gpsDownLeft,gpsDownRight,gpsUpLeft);
+        Coordinate mouse_GPS = new Coordinate (mouse_coordinates.vue2gps().getX(),mouse_coordinates.vue2gps().getY());
+        mouseBuilding = upsRouteService.getBuilding(mouse_GPS.getX(),mouse_GPS.getY());
+
+        TextToSpeech tts = new TextToSpeech();
+        tts.setVoice("upmc-pierre-hsmm");
+        tts.speak(convertBuildingName(mouseBuilding), 2.0f, false, true);
+
+        repaint();
+    }
+
+    //Changing the profile of the user (bicycle, on foot or wheelchair)
+    void setProfile(Profile profile) {
+        upsRouteService.setProfile(profile);
+    }
+
+    //Draws the route for a path selected with the application
+    void drawRoute(Location start, Location end) {
+        instructionWindow.setVisible(false);
+        mobileStartPointToDraw = null;
+        mobileEndPointToDraw = null;
+        UPSRoute upsRoute = upsRouteService.getRoute(start, end);
+
+        if (upsRoute != null) {
+            steps = upsRoute.getSteps();
+            coordinates = upsRoute.getCoordinates();
+            distance = upsRoute.getDistance();
+            duration = upsRoute.getDuration();
+        }
+        else
+            JOptionPane.showMessageDialog(this,
+                    "Impossible de trouver un itinéraire avec ces paramètres de navigation.",
+                    "Impossible de trouver le chemin",
+                    JOptionPane.ERROR_MESSAGE);
+    }
+
+    //Draws the route for a path selected using the camera and topcodes
+    private void drawRoute(GPSPoint start, GPSPoint end) {
+        UPSRoute upsRoute = upsRouteService.getRoute(start, end);
+
+        if (upsRoute != null) {
+            String startBuilding = upsRouteService.getBuilding(start.getLongitude(),start.getLatitude());
+            String endBuilding = upsRouteService.getBuilding(end.getLongitude(),end.getLatitude());
+            instructionWindow.refresh(upsRoute.getDistance(),upsRoute.getDuration(),upsRoute.getSteps(),startBuilding,endBuilding);
+            instructionWindow.setVisible(true);
+            steps = upsRoute.getSteps();
+            coordinates = upsRoute.getCoordinates();
+            distance = upsRoute.getDistance();
+            duration = upsRoute.getDuration();
         }
     }
 
@@ -243,17 +241,23 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     }
 
     //FUNCTIONS TO SET THE DIFFERENT POINTS
-
     void setMobileStartPointToDraw(GPSPoint gpsPoint) {
         //If we are in navigation mode and the route has been set
         if (routeConfirmed){
             if(navigationPoint != null){
-                Boolean isDif = (gpsPoint.getLongitude() != navigationPoint.getLongitude()) || (gpsPoint.getLatitude() != navigationPoint.getLatitude());
-                if (isDif) {
+                if ((gpsPoint.getLongitude() != navigationPoint.getLongitude()) || (gpsPoint.getLatitude() != navigationPoint.getLatitude())) {
                     navigationPoint = gpsPoint;
                     int closestPoint = closestPathPoint(gpsPoint);
                     String instruction = instructionToSay(gpsPoint, closestPoint);
-                    if (!instruction.equals("")){
+                    //if the user has deviated too much, redraw the route
+                    if (instruction.equals("ERROR")){
+                        resetRouteConfirm();
+                        mobileStartPointToDraw = gpsPoint;
+                        if (mobileEndPointToDraw != null) {
+                            drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
+                        }
+                        setRouteConfirm();
+                    }else if (!instruction.equals("")){
                         TextToSpeech tts = new TextToSpeech();
                         tts.setVoice("upmc-pierre-hsmm");
                         tts.speak(instruction, 2.0f, false, true);
@@ -265,8 +269,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             }
 
         } else if (mobileStartPointToDraw != null) {
-            Boolean isDif = (gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude());
-            if (isDif) {
+            //if the point has moved
+            if ((gpsPoint.getLongitude() != mobileStartPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileStartPointToDraw.getLatitude())) {
                 mobileStartPointToDraw = gpsPoint;
                 if (mobileEndPointToDraw != null) {
                     drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
@@ -279,8 +283,8 @@ public class UPSMapPanel extends JPanel implements MouseListener{
 
     void setMobileEndPointToDraw(GPSPoint gpsPoint) {
         if(mobileEndPointToDraw != null && !routeConfirmed) {
-            Boolean isDif = (gpsPoint.getLongitude() != mobileEndPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileEndPointToDraw.getLatitude());
-            if (isDif) {
+            //If the point has moved
+            if ((gpsPoint.getLongitude() != mobileEndPointToDraw.getLongitude()) || (gpsPoint.getLatitude() != mobileEndPointToDraw.getLatitude())) {
                 mobileEndPointToDraw = gpsPoint;
                 if (mobileStartPointToDraw != null) {
                     drawRoute(mobileStartPointToDraw, mobileEndPointToDraw);
@@ -317,6 +321,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     }
 
     void resetRouteConfirm (){
+        numTurnBack = 0;
         this.routeConfirmed = false;
         instructionNumber = 1;
     }
@@ -325,7 +330,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     /*::                          NAVIGATION                            :*/
     /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
-    int closestPathPoint(GPSPoint curPoint){
+    private int closestPathPoint(GPSPoint curPoint){
         double min = 1200;                                  //used the max distance on map
         int pointNumber = -1;
 
@@ -340,11 +345,16 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return pointNumber;
     }
 
-    String instructionToSay (GPSPoint curPoint,int closestPoint){
+    private String instructionToSay (GPSPoint curPoint,int closestPoint){
         String instruction = "";
 
         if (curPoint.distanceGPSPoint(coordinates.get(closestPoint)) >= 20){
-            instruction = "Faites demi-tour";
+            if (numTurnBack >=2){
+                instruction = "ERROR";
+            } else{
+                instruction = "Faites demi-tour";
+                numTurnBack++;
+            }
         } else if (closestPoint == coordinates.size()-1  ){                    //if it is the last point
             instruction = "Vous êtes arrivé";
             resetRouteConfirm();
@@ -360,9 +370,9 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                 if (aux.getWayPoints().get(0) == closestPoint){
                     instruNum = instruList.indexOf(aux);
                     trouve = true;
+                }
             }
-            }
-
+            //if it is an instruction and it is the next one in line
             if(trouve && instruNum == instructionNumber){
                 instructionNumber ++;
                 instruction = instruList.get(instruNum).toString();
@@ -447,8 +457,6 @@ public class UPSMapPanel extends JPanel implements MouseListener{
         return dScale;
     }
 
-    public int getScaleWidth() {
-        return scaleWidth;
-    }
+    public int getScaleWidth() { return scaleWidth;}
 }
 
