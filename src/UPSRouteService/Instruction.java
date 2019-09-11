@@ -11,17 +11,25 @@ public class Instruction {
     private static Map<Integer, String> instructionTypeNoNameMap = new HashMap<>() {{
         put(0, "Tourner à gauche");
         put(1, "Tourner à droite");
+        put(2, "Tourner immédiatement à gauche");
+        put(3, "Tourner immédiatement à droite");
         put(4, "Tourner légèrement à gauche");
-        put(10, "Votre destination est sur la gauche");
-        put(11, "Prendre la direction nord-est");
+        put(5, "Tourner légèrement à droite");
+        put(10, "Votre destination est droit devant");
+        put(12, "Rester à gauche");
+        put(13, "Rester à droite");
     }};
 
     private static Map<Integer, String> instructionTypeMap = new HashMap<>() {{
         put(0, "Tournez à gauche en direction de ");
         put(1, "Tournez à droite sur ");
+        put(2, "Tourner immédiatement à gauche sur ");
+        put(3, "Tourner immédiatement à droite sur ");
         put(4, "Tourner légèrement à gauche sur ");
-        put(10, "Votre destination est sur la gauche sur ");
-        put(11, "Prendre la direction nord-est sur ");
+        put(5, "Tourner légèrement à droite sur ");
+        put(10, "Votre destination est droit devant sur ");
+        put(12, "Rester à gauche sur ");
+        put(13, "Rester à droite sur ");
     }};
 
     Instruction(String name, int type, List<Integer> wayPoints) {

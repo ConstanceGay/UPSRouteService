@@ -53,6 +53,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private boolean routeConfirmed = false;                                 //if the user has confirmed this path
     private int instructionNumber = 1;                                      //which instruction the user is on
     private int numTurnBack = 0;                                            //number of times they were told to turn back
+    //private GPSPoint closPoint;
 
 
     UPSMapPanel(Location start, Location end) {
@@ -132,7 +133,12 @@ public class UPSMapPanel extends JPanel implements MouseListener{
             g.setColor(Color.BLACK);
             g.fillOval(navigationPoint.getGraphicsPoint().getCol() + xOffset - 5, navigationPoint.getGraphicsPoint().getRow() - 5, 10, 10);
         }
-
+        /*
+        if (closPoint != null){
+            g.setColor(Color.YELLOW);
+            g.fillOval(closPoint.getGraphicsPoint().getCol() + xOffset - 5, closPoint.getGraphicsPoint().getRow() - 5, 10, 10);
+        }
+        */
         //draws the exploration point in YELLOW
         if (explorationPoint != null){
             g.setColor(Color.MAGENTA);
@@ -248,6 +254,7 @@ public class UPSMapPanel extends JPanel implements MouseListener{
                 if ((gpsPoint.getLongitude() != navigationPoint.getLongitude()) || (gpsPoint.getLatitude() != navigationPoint.getLatitude())) {
                     navigationPoint = gpsPoint;
                     int closestPoint = closestPathPoint(gpsPoint);
+                    //closPoint = coordinates.get(closestPoint);
                     String instruction = instructionToSay(gpsPoint, closestPoint);
                     //if the user has deviated too much, redraw the route
                     if (instruction.equals("ERROR")){
@@ -348,7 +355,10 @@ public class UPSMapPanel extends JPanel implements MouseListener{
     private String instructionToSay (GPSPoint curPoint,int closestPoint){
         String instruction = "";
 
-        if (curPoint.distanceGPSPoint(coordinates.get(closestPoint)) >= 20){
+        if (curPoint.distanceGPSPoint(coordinates.get(closestPoint)) >= 60){
+            //System.out.println("Current point : "+curPoint.toString());
+            //System.out.println("Closest point : "+coordinates.get(closestPoint).toString());
+            //System.out.println("Distance : "+curPoint.distanceGPSPoint(coordinates.get(closestPoint)));
             if (numTurnBack >=2){
                 instruction = "ERROR";
             } else{

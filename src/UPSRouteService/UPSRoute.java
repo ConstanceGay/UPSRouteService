@@ -123,7 +123,16 @@ public class UPSRoute {
                     String name = step.get("name").toString();
                     int type = Integer.parseInt(step.get("type").toString());
                     String wayPointsStr = step.get("way_points").toString().replace("[", "").replace("]", "");
+
+                    //System.out.println(step.get("instruction").toString());
+                    //Translation
+                    if(type == 11){
+                        String instruction = step.get("instruction").toString();
+                        instruction = translateInstruction(instruction, name);
+                        path.add(new Instruction(getWayPoints(wayPointsStr), instruction));
+                    }else {
                     path.add(new Instruction(name, type, getWayPoints(wayPointsStr)));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -181,6 +190,49 @@ public class UPSRoute {
 
     public String toString() {
         return json.toString();
+    }
+
+    private String translateInstruction (String instruction , String name){
+        String cutInstru = instruction.substring(5);
+        if (!name.equals("-")){
+            cutInstru = cutInstru.substring(0,cutInstru.indexOf(" ")-1);
+        }
+        String frenchInstru = "";
+
+        switch (cutInstru){
+            case "north":
+                frenchInstru = "nord";
+                break;
+            case "east":
+                frenchInstru = "est";
+                break;
+            case "south":
+                frenchInstru = "sud";
+                break;
+            case "west":
+                frenchInstru = "ouest";
+                break;
+            case "northeast":
+                frenchInstru = "nord-est";
+                break;
+            case "southeast":
+                frenchInstru = "sud-est";
+                break;
+            case "southwest":
+                frenchInstru = "sud-ouest";
+                break;
+            case "northwest":
+                frenchInstru = "nord-ouest";
+                break;
+        }
+
+        if (!name.equals("-")) {
+            frenchInstru = "Prendre la direction "+frenchInstru+" en direction de "+name;
+        } else{
+            frenchInstru = "Prendre la direction "+frenchInstru;
+        }
+
+        return frenchInstru;
     }
 
 }
